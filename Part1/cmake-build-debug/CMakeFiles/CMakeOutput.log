@@ -28,7 +28,10 @@ The CXX compiler identification is GNU, found in "F:/C_Compiler/Part1/cmake-buil
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):F:/clion2022/CLion 2022.1.3/bin/ninja/win/ninja.exe cmTC_fdfc0 && [1/2] Building C object CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj
+Run Build Command(s):F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f Makefile cmTC_f692d/fast && F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe  -f CMakeFiles\cmTC_f692d.dir\build.make CMakeFiles/cmTC_f692d.dir/build
+mingw32-make[1]: Entering directory 'F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f692d.dir/CMakeCCompilerABI.c.obj
+F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe   -v -o CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj -c "F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCCompilerABI.c"
 Using built-in specs.
 COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe
 Target: x86_64-w64-mingw32
@@ -36,8 +39,8 @@ Configured with: ../gcc-11.2.0/configure --host=x86_64-w64-mingw32 --target=x86_
 Thread model: posix
 Supported LTO compression algorithms: zlib
 gcc version 11.2.0 (GCC) 
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_fdfc0.dir/'
- F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:/clion2022/CLion 2022.1.3/bin/cmake/win/share/cmake-3.22/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_fdfc0.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccxIB1cK.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_f692d.dir\'
+ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles\cmTC_f692d.dir\ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccDhMjPA.s
 GNU C17 (GCC) version 11.2.0 (x86_64-w64-mingw32)
 	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version none
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -58,13 +61,17 @@ GNU C17 (GCC) version 11.2.0 (x86_64-w64-mingw32)
 	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version none
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 23424b72d090e8b977a96775bde79257
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_fdfc0.dir/'
- as -v -o CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj C:\Users\LHX\AppData\Local\Temp\ccxIB1cK.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_f692d.dir\'
+ as -v -o CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj C:\Users\LHX\AppData\Local\Temp\ccDhMjPA.s
 GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37
 COMPILER_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/
 LIBRARY_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.'
-[2/2] Linking C executable cmTC_fdfc0.exe
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.'
+Linking C executable cmTC_f692d.exe
+"F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_f692d.dir\link.txt --verbose=1
+"F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_f692d.dir/objects.a
+F:\CLION2~1\CLION2~1.3\bin\mingw\bin\ar.exe qc CMakeFiles\cmTC_f692d.dir/objects.a @CMakeFiles\cmTC_f692d.dir\objects1.rsp
+F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe  -v -Wl,--whole-archive CMakeFiles\cmTC_f692d.dir/objects.a -Wl,--no-whole-archive -o cmTC_f692d.exe -Wl,--out-implib,libcmTC_f692d.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
 Using built-in specs.
 COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe
 COLLECT_LTO_WRAPPER=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe
@@ -75,9 +82,10 @@ Supported LTO compression algorithms: zlib
 gcc version 11.2.0 (GCC) 
 COMPILER_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/
 LIBRARY_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_fdfc0.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_fdfc0.'
- F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_fdfc0.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj --out-implib libcmTC_fdfc0.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_fdfc0.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_fdfc0.'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f692d.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f692d.'
+ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_f692d.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. --whole-archive CMakeFiles\cmTC_f692d.dir/objects.a --no-whole-archive --out-implib libcmTC_f692d.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f692d.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f692d.'
+mingw32-make[1]: Leaving directory 'F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
 
@@ -100,7 +108,10 @@ Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):F:/clion2022/CLion 2022.1.3/bin/ninja/win/ninja.exe cmTC_fdfc0 && [1/2] Building C object CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [Run Build Command(s):F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f Makefile cmTC_f692d/fast && F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe  -f CMakeFiles\cmTC_f692d.dir\build.make CMakeFiles/cmTC_f692d.dir/build]
+  ignore line: [mingw32-make[1]: Entering directory 'F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_f692d.dir/CMakeCCompilerABI.c.obj]
+  ignore line: [F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe   -v -o CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj -c "F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCCompilerABI.c"]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe]
   ignore line: [Target: x86_64-w64-mingw32]
@@ -108,8 +119,8 @@ Parsed C implicit link information from above output:
   ignore line: [Thread model: posix]
   ignore line: [Supported LTO compression algorithms: zlib]
   ignore line: [gcc version 11.2.0 (GCC) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_fdfc0.dir/']
-  ignore line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:/clion2022/CLion 2022.1.3/bin/cmake/win/share/cmake-3.22/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_fdfc0.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccxIB1cK.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_f692d.dir\']
+  ignore line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles\cmTC_f692d.dir\ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccDhMjPA.s]
   ignore line: [GNU C17 (GCC) version 11.2.0 (x86_64-w64-mingw32)]
   ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version none]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -130,8 +141,8 @@ Parsed C implicit link information from above output:
   ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version none]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 23424b72d090e8b977a96775bde79257]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_fdfc0.dir/']
-  ignore line: [ as -v -o CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj C:\Users\LHX\AppData\Local\Temp\ccxIB1cK.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_f692d.dir\']
+  ignore line: [ as -v -o CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj C:\Users\LHX\AppData\Local\Temp\ccDhMjPA.s]
   ignore line: [GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37]
   ignore line: [COMPILER_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/]
@@ -141,8 +152,12 @@ Parsed C implicit link information from above output:
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.']
-  ignore line: [[2/2] Linking C executable cmTC_fdfc0.exe]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.obj' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_f692d.dir\CMakeCCompilerABI.c.']
+  ignore line: [Linking C executable cmTC_f692d.exe]
+  ignore line: ["F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_f692d.dir\link.txt --verbose=1]
+  ignore line: ["F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_f692d.dir/objects.a]
+  ignore line: [F:\CLION2~1\CLION2~1.3\bin\mingw\bin\ar.exe qc CMakeFiles\cmTC_f692d.dir/objects.a @CMakeFiles\cmTC_f692d.dir\objects1.rsp]
+  ignore line: [F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe  -v -Wl --whole-archive CMakeFiles\cmTC_f692d.dir/objects.a -Wl --no-whole-archive -o cmTC_f692d.exe -Wl --out-implib libcmTC_f692d.dll.a -Wl --major-image-version 0 --minor-image-version 0 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\gcc.exe]
   ignore line: [COLLECT_LTO_WRAPPER=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe]
@@ -159,14 +174,14 @@ Parsed C implicit link information from above output:
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_fdfc0.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_fdfc0.']
-  link line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_fdfc0.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj --out-implib libcmTC_fdfc0.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f692d.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f692d.']
+  link line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_f692d.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. --whole-archive CMakeFiles\cmTC_f692d.dir/objects.a --no-whole-archive --out-implib libcmTC_f692d.dll.a --major-image-version 0 --minor-image-version 0 -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc -lgcc_eh -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
     arg [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe] ==> ignore
     arg [-m] ==> ignore
     arg [i386pep] ==> ignore
     arg [-Bdynamic] ==> search dynamic
     arg [-o] ==> ignore
-    arg [cmTC_fdfc0.exe] ==> ignore
+    arg [cmTC_f692d.exe] ==> ignore
     arg [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o] ==> obj [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o]
     arg [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o] ==> obj [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o]
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0]
@@ -175,9 +190,11 @@ Parsed C implicit link information from above output:
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib]
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib]
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..]
-    arg [CMakeFiles/cmTC_fdfc0.dir/CMakeCCompilerABI.c.obj] ==> ignore
+    arg [--whole-archive] ==> ignore
+    arg [CMakeFiles\cmTC_f692d.dir/objects.a] ==> ignore
+    arg [--no-whole-archive] ==> ignore
     arg [--out-implib] ==> ignore
-    arg [libcmTC_fdfc0.dll.a] ==> ignore
+    arg [libcmTC_f692d.dll.a] ==> ignore
     arg [--major-image-version] ==> ignore
     arg [0] ==> ignore
     arg [--minor-image-version] ==> ignore
@@ -227,7 +244,10 @@ Parsed C implicit link information from above output:
 Detecting CXX compiler ABI info compiled with the following output:
 Change Dir: F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):F:/clion2022/CLion 2022.1.3/bin/ninja/win/ninja.exe cmTC_090a8 && [1/2] Building CXX object CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj
+Run Build Command(s):F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f Makefile cmTC_e6f18/fast && F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe  -f CMakeFiles\cmTC_e6f18.dir\build.make CMakeFiles/cmTC_e6f18.dir/build
+mingw32-make[1]: Entering directory 'F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_e6f18.dir/CMakeCXXCompilerABI.cpp.obj
+F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE   -v -o CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj -c "F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCXXCompilerABI.cpp"
 Using built-in specs.
 COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE
 Target: x86_64-w64-mingw32
@@ -235,8 +255,8 @@ Configured with: ../gcc-11.2.0/configure --host=x86_64-w64-mingw32 --target=x86_
 Thread model: posix
 Supported LTO compression algorithms: zlib
 gcc version 11.2.0 (GCC) 
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_090a8.dir/'
- F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:/clion2022/CLion 2022.1.3/bin/cmake/win/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_090a8.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccieGvlk.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_e6f18.dir\'
+ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\cmTC_e6f18.dir\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccNS0Xdi.s
 GNU C++17 (GCC) version 11.2.0 (x86_64-w64-mingw32)
 	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version none
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -263,13 +283,17 @@ GNU C++17 (GCC) version 11.2.0 (x86_64-w64-mingw32)
 	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version none
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: 916242a6eadede3a42d72bc0142b939f
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_090a8.dir/'
- as -v -o CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\LHX\AppData\Local\Temp\ccieGvlk.s
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_e6f18.dir\'
+ as -v -o CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj C:\Users\LHX\AppData\Local\Temp\ccNS0Xdi.s
 GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37
 COMPILER_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/
 LIBRARY_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.'
-[2/2] Linking CXX executable cmTC_090a8.exe
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.'
+Linking CXX executable cmTC_e6f18.exe
+"F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_e6f18.dir\link.txt --verbose=1
+"F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_e6f18.dir/objects.a
+F:\CLION2~1\CLION2~1.3\bin\mingw\bin\ar.exe qc CMakeFiles\cmTC_e6f18.dir/objects.a @CMakeFiles\cmTC_e6f18.dir\objects1.rsp
+F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE  -v -Wl,--whole-archive CMakeFiles\cmTC_e6f18.dir/objects.a -Wl,--no-whole-archive -o cmTC_e6f18.exe -Wl,--out-implib,libcmTC_e6f18.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
 Using built-in specs.
 COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE
 COLLECT_LTO_WRAPPER=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe
@@ -280,9 +304,10 @@ Supported LTO compression algorithms: zlib
 gcc version 11.2.0 (GCC) 
 COMPILER_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/
 LIBRARY_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/;F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_090a8.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_090a8.'
- F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_090a8.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj --out-implib libcmTC_090a8.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_090a8.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_090a8.'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e6f18.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_e6f18.'
+ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_e6f18.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. --whole-archive CMakeFiles\cmTC_e6f18.dir/objects.a --no-whole-archive --out-implib libcmTC_e6f18.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e6f18.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_e6f18.'
+mingw32-make[1]: Leaving directory 'F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp'
 
 
 
@@ -311,7 +336,10 @@ Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
   ignore line: [Change Dir: F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command(s):F:/clion2022/CLion 2022.1.3/bin/ninja/win/ninja.exe cmTC_090a8 && [1/2] Building CXX object CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [Run Build Command(s):F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f Makefile cmTC_e6f18/fast && F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe  -f CMakeFiles\cmTC_e6f18.dir\build.make CMakeFiles/cmTC_e6f18.dir/build]
+  ignore line: [mingw32-make[1]: Entering directory 'F:/C_Compiler/Part1/cmake-build-debug/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_e6f18.dir/CMakeCXXCompilerABI.cpp.obj]
+  ignore line: [F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE   -v -o CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj -c "F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCXXCompilerABI.cpp"]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE]
   ignore line: [Target: x86_64-w64-mingw32]
@@ -319,8 +347,8 @@ Parsed CXX implicit link information from above output:
   ignore line: [Thread model: posix]
   ignore line: [Supported LTO compression algorithms: zlib]
   ignore line: [gcc version 11.2.0 (GCC) ]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_090a8.dir/']
-  ignore line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:/clion2022/CLion 2022.1.3/bin/cmake/win/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_090a8.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccieGvlk.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_e6f18.dir\']
+  ignore line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/cc1plus.exe -quiet -v -iprefix F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/ -D_REENTRANT F:\clion2022\CLion 2022.1.3\bin\cmake\win\share\cmake-3.22\Modules\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\cmTC_e6f18.dir\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o C:\Users\LHX\AppData\Local\Temp\ccNS0Xdi.s]
   ignore line: [GNU C++17 (GCC) version 11.2.0 (x86_64-w64-mingw32)]
   ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version none]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -347,8 +375,8 @@ Parsed CXX implicit link information from above output:
   ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version none]
   ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
   ignore line: [Compiler executable checksum: 916242a6eadede3a42d72bc0142b939f]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_090a8.dir/']
-  ignore line: [ as -v -o CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj C:\Users\LHX\AppData\Local\Temp\ccieGvlk.s]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_e6f18.dir\']
+  ignore line: [ as -v -o CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj C:\Users\LHX\AppData\Local\Temp\ccNS0Xdi.s]
   ignore line: [GNU assembler version 2.37 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.37]
   ignore line: [COMPILER_PATH=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/]
@@ -358,8 +386,12 @@ Parsed CXX implicit link information from above output:
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.']
-  ignore line: [[2/2] Linking CXX executable cmTC_090a8.exe]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles\cmTC_e6f18.dir\CMakeCXXCompilerABI.cpp.']
+  ignore line: [Linking CXX executable cmTC_e6f18.exe]
+  ignore line: ["F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_e6f18.dir\link.txt --verbose=1]
+  ignore line: ["F:\clion2022\CLion 2022.1.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_e6f18.dir/objects.a]
+  ignore line: [F:\CLION2~1\CLION2~1.3\bin\mingw\bin\ar.exe qc CMakeFiles\cmTC_e6f18.dir/objects.a @CMakeFiles\cmTC_e6f18.dir\objects1.rsp]
+  ignore line: [F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE  -v -Wl --whole-archive CMakeFiles\cmTC_e6f18.dir/objects.a -Wl --no-whole-archive -o cmTC_e6f18.exe -Wl --out-implib libcmTC_e6f18.dll.a -Wl --major-image-version 0 --minor-image-version 0 ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=F:\CLION2~1\CLION2~1.3\bin\mingw\bin\G__~1.EXE]
   ignore line: [COLLECT_LTO_WRAPPER=F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/lto-wrapper.exe]
@@ -376,14 +408,14 @@ Parsed CXX implicit link information from above output:
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/]
   ignore line: [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_090a8.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_090a8.']
-  link line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_090a8.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj --out-implib libcmTC_090a8.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_e6f18.exe' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_e6f18.']
+  link line: [ F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe -m i386pep -Bdynamic -o cmTC_e6f18.exe F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0 -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib -LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../.. --whole-archive CMakeFiles\cmTC_e6f18.dir/objects.a --no-whole-archive --out-implib libcmTC_e6f18.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -liconv -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt -lkernel32 F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/default-manifest.o F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtend.o]
     arg [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../libexec/gcc/x86_64-w64-mingw32/11.2.0/collect2.exe] ==> ignore
     arg [-m] ==> ignore
     arg [i386pep] ==> ignore
     arg [-Bdynamic] ==> search dynamic
     arg [-o] ==> ignore
-    arg [cmTC_090a8.exe] ==> ignore
+    arg [cmTC_e6f18.exe] ==> ignore
     arg [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o] ==> obj [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib/../lib/crt2.o]
     arg [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o] ==> obj [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/crtbegin.o]
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0]
@@ -392,9 +424,11 @@ Parsed CXX implicit link information from above output:
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../lib]
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/lib]
     arg [-LF:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..] ==> dir [F:/CLION2~1/CLION2~1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../..]
-    arg [CMakeFiles/cmTC_090a8.dir/CMakeCXXCompilerABI.cpp.obj] ==> ignore
+    arg [--whole-archive] ==> ignore
+    arg [CMakeFiles\cmTC_e6f18.dir/objects.a] ==> ignore
+    arg [--no-whole-archive] ==> ignore
     arg [--out-implib] ==> ignore
-    arg [libcmTC_090a8.dll.a] ==> ignore
+    arg [libcmTC_e6f18.dll.a] ==> ignore
     arg [--major-image-version] ==> ignore
     arg [0] ==> ignore
     arg [--minor-image-version] ==> ignore
