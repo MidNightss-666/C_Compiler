@@ -42,6 +42,7 @@ namespace mc
         Lexer(string text)
         {
             _text=text;
+            _position=0;
         }
 
         void Next()
@@ -121,6 +122,7 @@ namespace mc
     class Statement
     {
     public:
+        Statement(){}
         Statement(StatementType type,Exp* exp)
         {
             _type=type;
@@ -133,6 +135,7 @@ namespace mc
     class Function
     {
     public:
+        Function(){}
         Function(Statement* statement,string name)
         {
             _statement=statement;
@@ -160,62 +163,90 @@ namespace mc
             _lexer=lexer;
         }
 
-        Exp parse_exp()
+        //parse the number
+        Exp* parse_exp()
         {
             SyntaxToken p=_lexer->NextToken();
-            if (p._kind!=SyntaxKind::IntToken)
-                fail("exp error");
+            if (p._kind!=SyntaxKind::NumberToken)
+                fail("exp error1");
 
-            return Exp(p._text);
+            Exp* exp=new Exp(p._text);
+            return exp;
         }
 
-        Statement parse_statement()
+        //parse the statement
+        Statement* parse_statement()
         {
             SyntaxToken p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::RetToken) fail("statement error");
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+
+            if(p._kind!=SyntaxKind::RetToken) fail("statement error1");
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::BlankToken) fail("statement error");
-            Exp exp=parse_exp();
+            if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
+            Exp* exp=parse_exp();
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::SemiToken) fail("statement error");
-            return Statement(StatementType::Return,&exp);
+            if(p._kind!=SyntaxKind::SemiToken) fail("statement error3");
+
+            Statement* statement=new Statement(StatementType::Return,exp);
+            return statement;
         }
 
-        Function parse_function()
+        //parse the function
+        Function* parse_function()
         {
+            //int main() {    return 2;}
             SyntaxToken p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::IntToken) fail("function error");
+            if(p._kind!=SyntaxKind::IntToken) fail("function error1");
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::BlankToken) fail("function error");
+            if(p._kind!=SyntaxKind::BlankToken) fail("function error2");
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::IdToken) fail("function error");
+            if(p._kind!=SyntaxKind::IdToken) fail("function error3");
 
+            //function name
             string name=p._text;
 
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::BlankToken) fail("function error");
-            p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::OpToken) fail("function error");
-            p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::CpToken) fail("function error");
-            p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::OBraceToken) fail("function error");
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
 
-            Statement statement=parse_statement();
+            if(p._kind!=SyntaxKind::OpToken) fail("function error4");
+            p=_lexer->NextToken();
+
+//            cout<<"TYPE:"<<p._kind<<endl;
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+
+            if(p._kind!=SyntaxKind::CpToken) fail("function error5");
+            p=_lexer->NextToken();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::OBraceToken) fail("function error6");
+
+
+            Statement* statement=parse_statement();
 
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::CBraceToken) fail("function error");
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::CBraceToken) fail("function error7");
 
-            return Function(&statement,name);
+            Function* function=new Function(statement,name);
+
+
+            return function;
         }
 
-        Program parse_program()
+        //parse the program
+        Program* parse_program()
         {
-            Function function=parse_function();
-            return Program(&function);
+            Function* function=parse_function();
+            Program* program=new Program(function);
+
+            return program;
         }
-
-
 
     private:
         Lexer* _lexer;
@@ -225,10 +256,12 @@ namespace mc
             exit(EXIT_FAILURE);
         }
 
-
-
-
     };
+
+    __attribute__((unused)) void pretty_print()
+    {
+
+    }
 }
 
 
@@ -238,17 +271,29 @@ int main(int argc,char* argv[]) {
     if(test)
     {
         ifstream fin;
-        fin.open("return_2.txt",ios::in);
+        fin.open(R"(F:\C_Compiler\Part1\return_2.c)",ios::in);
         if(!fin.is_open())
         {
-            cout<<"failed";
+            cout<<"failed when opening file";
             exit(EXIT_FAILURE);
         }
         string buff;
+        string text="";
         while(getline(fin,buff))
         {
-            cout<<buff;
+            text.append(buff);
         }
+        mc::Lexer* lexer=new mc::Lexer(text);
+        mc::Parser* parser=new mc::Parser(lexer);
+
+        //get info of the program
+        mc::Program* program=parser->parse_program();
+
+        string name=program->_function->_name;
+        string val=program->_function->_statement->_exp->_text;
+
+        cout<<name<<endl<<val;
+
 
 
     }else
