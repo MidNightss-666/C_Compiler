@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 
@@ -23,7 +23,7 @@ namespace mc
         CBraceToken,
         OpToken,
         CpToken,
-        SemiToken,
+        SemiToken,//;
         BadToken
     };
 
@@ -107,54 +107,56 @@ namespace mc
         }
     };
 
-//    class statement{
-//    public:
-//        statement(int val)
-//        {
-//            _val=val;
-//        }
-//
-//    private:
-//
-//        int _val;
-//    };
-//
-//    class function{
-//    public:
-//        function(statement s)
-//        {
-//
-//        }
-//    private:
-//    };
-//
-//    class program{
-//    public:
-//        program(function f)
-//        {
-//
-//        }
-//    private:
-//
-//    };
-
-    enum NodeType{
-        statement,
-        function,
-        program,
-        exp
+    enum StatementType{
+        Return
     };
-    class NodeTree{
-        NodeType _type;
-        string _text;
+
+
+
+    class Exp
+    {
     public:
-        NodeTree(NodeType type,string text)
+        Exp(string text)
         {
-            _type=type;
             _text=text;
         }
+        string _text;
+        int val;
     };
 
+    class Statement
+    {
+    public:
+        Statement(StatementType type,Exp* exp)
+        {
+            _type=type;
+            _exp=exp;
+        }
+        StatementType _type;
+        Exp* _exp;
+    };
+
+    class Function
+    {
+    public:
+        Function(Statement* statement,string name)
+        {
+            _statement=statement;
+            _name=name;
+        }
+        Statement* _statement;
+        string _name;
+    };
+
+    class Program
+    {
+    public:
+        Program(Function* function)
+        {
+            _function=function;
+        }
+        Function* _function;
+    };
 
     //语法分析器
     class Parser{
@@ -164,32 +166,67 @@ namespace mc
             _lexer=lexer;
         }
 
-        NodeTree parse_exp()
+        Exp parse_exp()
         {
             SyntaxToken p=_lexer->NextToken();
             if (p._kind!=SyntaxKind::IntToken)
                 fail("exp error");
 
-            return NodeTree(exp,p._text);
+            return Exp(p._text);
         }
 
-        NodeTree parse_statement()
+        Statement parse_statement()
         {
             SyntaxToken p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::RetToken)
-                fail("statement error");
+            if(p._kind!=SyntaxKind::RetToken) fail("statement error");
             p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::BlankToken)
-                fail("statement error");
-            
+            if(p._kind!=SyntaxKind::BlankToken) fail("statement error");
+            Exp exp=parse_exp();
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::SemiToken) fail("statement error");
+            return Statement(StatementType::Return,&exp);
         }
+
+        Function parse_function()
+        {
+            SyntaxToken p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::IntToken) fail("function error");
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::BlankToken) fail("function error");
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::IdToken) fail("function error");
+
+            string name=p._text;
+
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::BlankToken) fail("function error");
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::OpToken) fail("function error");
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::CpToken) fail("function error");
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::OBraceToken) fail("function error");
+
+            Statement statement=parse_statement();
+
+            p=_lexer->NextToken();
+            if(p._kind!=SyntaxKind::CBraceToken) fail("function error");
+
+            return Function(&statement,name);
+        }
+
+        Program parse_program()
+        {
+            Function function=parse_function();
+            return Program(&function);
+        }
+
 
 
     private:
         Lexer* _lexer;
         static void fail(const char* text)
         {
-
             fprintf(stderr,text);
             exit(EXIT_FAILURE);
         }
