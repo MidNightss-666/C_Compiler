@@ -1,18 +1,14 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <istream>
+#include <fstream>
 
 using namespace std;
 
 
 namespace mc
 {
-    class Solve{
-
-
-    };
-
-
     enum SyntaxKind{
         NumberToken,
         BlankToken,
@@ -110,8 +106,6 @@ namespace mc
     enum StatementType{
         Return
     };
-
-
 
     class Exp
     {
@@ -240,12 +234,33 @@ namespace mc
 
 
 int main(int argc,char* argv[]) {
-    if(argc<2)
+    int test=1;
+    if(test)
     {
-        cout<<"invalid usage"<<endl;
-        return 1;
-    }
-    char* filename=argv[1];
-    char c;
+        ifstream fin;
+        fin.open("return_2.txt",ios::in);
+        if(!fin.is_open())
+        {
+            cout<<"failed";
+            exit(EXIT_FAILURE);
+        }
+        string buff;
+        while(getline(fin,buff))
+        {
+            cout<<buff;
+        }
 
+
+    }else
+    {
+        if(argc<2)
+        {
+            cout<<"invalid usage"<<endl;
+            return 1;
+        }
+        char* filename=argv[1];
+        char c;
+    }
+
+    return 0;
 }
