@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include <istream>
+#include <ostream>
 #include <fstream>
 
 using namespace std;
@@ -187,6 +188,8 @@ namespace mc
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
             Exp* exp=parse_exp();
             p=_lexer->NextToken();
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::SemiToken) fail("statement error3");
 
             Statement* statement=new Statement(StatementType::Return,exp);
@@ -198,6 +201,8 @@ namespace mc
         {
             //int main() {    return 2;}
             SyntaxToken p=_lexer->NextToken();
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::IntToken) fail("function error1");
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("function error2");
@@ -267,7 +272,7 @@ namespace mc
 
 
 int main(int argc,char* argv[]) {
-    int test=1;
+    int test=0;
     if(test)
     {
         ifstream fin;
@@ -283,6 +288,8 @@ int main(int argc,char* argv[]) {
         {
             text.append(buff);
         }
+        fin.close();
+
         mc::Lexer* lexer=new mc::Lexer(text);
         mc::Parser* parser=new mc::Parser(lexer);
 
@@ -292,9 +299,13 @@ int main(int argc,char* argv[]) {
         string name=program->_function->_name;
         string val=program->_function->_statement->_exp->_text;
 
-        cout<<name<<endl<<val;
-
-
+//        cout<<name<<endl<<val;
+        ofstream fout("return_2.s");
+        fout<<" .globl"<<" "<<name<<endl;
+        fout<<name<<":"<<endl;
+        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+        fout<<"ret";
+        fout.close();
 
     }else
     {
@@ -303,9 +314,57 @@ int main(int argc,char* argv[]) {
             cout<<"invalid usage"<<endl;
             return 1;
         }
-        char* filename=argv[1];
-        char c;
+        const char* filename=argv[1];
+        ifstream fin;
+        fin.open(filename,ios::in);
+        if(!fin.is_open())
+        {
+            cout<<"failed when opening file";
+            exit(EXIT_FAILURE);
+        }
+        string buff;
+        string text="";
+        while(getline(fin,buff))
+        {
+            text.append(buff+" ");
+        }
+        fin.close();
+
+        cout<<text<<endl;
+
+        mc::Lexer* lexer=new mc::Lexer(text);
+        mc::Parser* parser=new mc::Parser(lexer);
+
+        //get info of the program
+        mc::Program* program=parser->parse_program();
+
+        string name=program->_function->_name;
+        string val=program->_function->_statement->_exp->_text;
+
+//        ofstream fout("return_2.s");
+//        fout<<" .globl"<<" "<<"_"<<name<<endl;
+//        fout<<"_"<<name<<":"<<endl;
+//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+//        fout<<"ret";
+//        fout.close();
+
+        string Filename=filename;
+        int length=Filename.length();
+        Filename=Filename.substr(0,length-2);
+//        cout<<Filename;
+        ofstream fout(Filename+".s");
+        fout<<" .globl"<<" "<<name<<endl;
+        fout<<name<<":"<<endl;
+        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+        fout<<"ret";
+        fout.close();
+        string command="gcc ";
+
+        command.append(Filename+".s -o ").append(Filename);
+        system(command.c_str());
     }
 
     return 0;
 }
+
+
