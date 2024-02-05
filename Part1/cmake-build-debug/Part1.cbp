@@ -61,6 +61,50 @@
 					<DistClean command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="Part2">
+				<Option output="F:/C_Compiler/Part1/cmake-build-debug/Part2.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="F:/C_Compiler/Part1/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../include"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 Part2"/>
+					<CompileFile command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Part2/fast">
+				<Option output="F:/C_Compiler/Part1/cmake-build-debug/Part2.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="F:/C_Compiler/Part1/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../include"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed"/>
+					<Add directory="F:/clion2022/CLion 2022.1.3/bin/mingw/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 Part2/fast"/>
+					<CompileFile command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="F:/CLION2~1/CLION2~1.3/bin/mingw/bin/mingw32-make.exe -f &quot;F:/C_Compiler/Part1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="edit_cache">
 				<Option working_dir="F:/C_Compiler/Part1/cmake-build-debug"/>
 				<Option type="4"/>
@@ -84,6 +128,9 @@
 		</Build>
 		<Unit filename="F:/C_Compiler/Part1/main.cpp">
 			<Option target="Part1"/>
+		</Unit>
+		<Unit filename="F:/C_Compiler/Part2/main.cpp">
+			<Option target="Part2"/>
 		</Unit>
 		<Unit filename="F:/C_Compiler/Part1/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>

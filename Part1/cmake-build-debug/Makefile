@@ -128,6 +128,43 @@ Part1/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part1.dir\build.make CMakeFiles/Part1.dir/build
 .PHONY : Part1/fast
 
+#=============================================================================
+# Target rules for targets named Part2
+
+# Build rule for target.
+Part2: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 Part2
+.PHONY : Part2
+
+# fast build rule for target.
+Part2/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part2.dir\build.make CMakeFiles/Part2.dir/build
+.PHONY : Part2/fast
+
+F_/C_Compiler/Part2/main.obj: F_/C_Compiler/Part2/main.cpp.obj
+.PHONY : F_/C_Compiler/Part2/main.obj
+
+# target to build an object file
+F_/C_Compiler/Part2/main.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part2.dir\build.make CMakeFiles/Part2.dir/F_/C_Compiler/Part2/main.cpp.obj
+.PHONY : F_/C_Compiler/Part2/main.cpp.obj
+
+F_/C_Compiler/Part2/main.i: F_/C_Compiler/Part2/main.cpp.i
+.PHONY : F_/C_Compiler/Part2/main.i
+
+# target to preprocess a source file
+F_/C_Compiler/Part2/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part2.dir\build.make CMakeFiles/Part2.dir/F_/C_Compiler/Part2/main.cpp.i
+.PHONY : F_/C_Compiler/Part2/main.cpp.i
+
+F_/C_Compiler/Part2/main.s: F_/C_Compiler/Part2/main.cpp.s
+.PHONY : F_/C_Compiler/Part2/main.s
+
+# target to generate assembly for a file
+F_/C_Compiler/Part2/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part2.dir\build.make CMakeFiles/Part2.dir/F_/C_Compiler/Part2/main.cpp.s
+.PHONY : F_/C_Compiler/Part2/main.cpp.s
+
 main.obj: main.cpp.obj
 .PHONY : main.obj
 
@@ -161,6 +198,10 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... Part1
+	@echo ... Part2
+	@echo ... F_/C_Compiler/Part2/main.obj
+	@echo ... F_/C_Compiler/Part2/main.i
+	@echo ... F_/C_Compiler/Part2/main.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
