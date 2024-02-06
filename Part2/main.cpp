@@ -107,9 +107,9 @@ namespace mc
             else if(Current()=='(') return SyntaxToken(SyntaxKind::OpToken,_position++,"(");
             else if(Current()==')') return SyntaxToken(SyntaxKind::CpToken,_position++,")");
             else if(Current()==';') return SyntaxToken(SyntaxKind::SemiToken,_position++,";");
-            else if(Current()=='-') return SyntaxToken(SyntaxKind::NegaToken,_position++,";");
-            else if(Current()=='~') return SyntaxToken(SyntaxKind::BComplementToken,_position++,";");
-            else if(Current()=='!') return SyntaxToken(SyntaxKind::LogiNegaToken,_position++,";");
+            else if(Current()=='-') return SyntaxToken(SyntaxKind::NegaToken,_position++,"-");
+            else if(Current()=='~') return SyntaxToken(SyntaxKind::BComplementToken,_position++,"~");
+            else if(Current()=='!') return SyntaxToken(SyntaxKind::LogiNegaToken,_position++,"!");
             else return SyntaxToken(SyntaxKind::BadToken,_position++,_text.substr(_position-1,1));
         }
     private:
@@ -205,16 +205,18 @@ namespace mc
                 exp->_val= stoi(exp->_text);
                 exp->_isdigit= true;
                 return exp;
-            }else if(isUnaryOp(&p))
+            }else if(mc::isUnaryOp(&p))
             {
                 //get the unary operator
                 Exp* exp=new Exp(p._text);
                 Exp* inner_exp=parse_exp();
                 exp->_next=inner_exp;
+                return exp;
             }else
             {
                 fail("exp error1");
             }
+
 
         }
 
@@ -313,9 +315,9 @@ namespace mc
         if(exp==NULL) return;
         exp_out(exp->_next,fout);
         if(exp->_text=="-")
-            fout<<"neg     %eax";
+            fout<<"neg     %eax"<<endl;
         else if(exp->_text=="~")
-            fout<<"not     %eax";
+            fout<<"not     %eax"<<endl;
         else if(exp->_text=="!")
         {
             fout<<"cmpl    $0, %eax"<<endl;
@@ -338,6 +340,20 @@ namespace mc
         fout<<"ret";
 
         fout.close();
+    }
+
+    void pretty_print(Program* program)
+    {
+        cout<<"program:"<<program->_function->_name<<endl;
+        Exp* exp=program->_function->_statement->_exp;
+        while(exp!=NULL)
+        {
+
+            cout << exp->_text<<endl;
+            exp= exp->_next;
+        }
+
+
     }
 }
 
@@ -418,12 +434,13 @@ int main(int argc,char* argv[]) {
         Filename=Filename.substr(0,length-2);
         ofstream fout(Filename+".s");
         //print
+
 //        fout<<" .globl"<<" "<<name<<endl;
 //        fout<<name<<":"<<endl;
 //        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
 //        fout<<"ret";
 //        fout.close();
-
+//        mc::pretty_print(program);
         mc::aOut(program,fout);
         string command="gcc ";
 
