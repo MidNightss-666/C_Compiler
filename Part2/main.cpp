@@ -138,6 +138,7 @@ namespace mc
         string _text;
         int _val;
         Exp* _next= nullptr;
+        bool _isdigit= false;
     };
 
     class Statement
@@ -163,6 +164,7 @@ namespace mc
             _name=name;
         }
         Statement* _statement;
+        //函数名称
         string _name;
     };
 
@@ -201,6 +203,7 @@ namespace mc
             {
                 Exp* exp=new Exp(p._text);
                 exp->_val= stoi(exp->_text);
+                exp->_isdigit= true;
                 return exp;
             }else if(isUnaryOp(&p))
             {
@@ -305,9 +308,36 @@ namespace mc
 
     };
 
-    __attribute__((unused)) void pretty_print()
+    void exp_out(Exp* exp,ofstream &fout)
     {
+        if(exp==NULL) return;
+        exp_out(exp->_next,fout);
+        if(exp->_text=="-")
+            fout<<"neg     %eax";
+        else if(exp->_text=="~")
+            fout<<"not     %eax";
+        else if(exp->_text=="!")
+        {
+            fout<<"cmpl    $0, %eax"<<endl;
+            fout<<"movl    $0, %eax"<<endl;
+            fout<<"sete    %al"<<endl;
+        }
+        else if(exp->_isdigit)
+            fout<<" movl    $"<<exp->_text<<","<<" %eax"<<endl;
+    }
 
+
+    void aOut(Program* program,ofstream &fout)
+    {
+        string name=program->_function->_name;
+        fout<<" .globl"<<" "<<name<<endl;
+        fout<<name<<":"<<endl;
+
+        Exp* exp=program->_function->_statement->_exp;
+        exp_out(exp,fout);
+        fout<<"ret";
+
+        fout.close();
     }
 }
 
@@ -383,23 +413,18 @@ int main(int argc,char* argv[]) {
         string name=program->_function->_name;
         string val=program->_function->_statement->_exp->_text;
 
-//        ofstream fout("return_2.s");
-//        fout<<" .globl"<<" "<<"_"<<name<<endl;
-//        fout<<"_"<<name<<":"<<endl;
-//        fout<<" movl    $"<<_val<<","<<" %eax"<<endl;
-//        fout<<"ret";
-//        fout.close();
-
         string Filename=filename;
         int length=Filename.length();
         Filename=Filename.substr(0,length-2);
-//        cout<<Filename;
         ofstream fout(Filename+".s");
-        fout<<" .globl"<<" "<<name<<endl;
-        fout<<name<<":"<<endl;
-        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
-        fout<<"ret";
-        fout.close();
+        //print
+//        fout<<" .globl"<<" "<<name<<endl;
+//        fout<<name<<":"<<endl;
+//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+//        fout<<"ret";
+//        fout.close();
+
+        mc::aOut(program,fout);
         string command="gcc ";
 
         command.append(Filename+".s -o ").append(Filename);
