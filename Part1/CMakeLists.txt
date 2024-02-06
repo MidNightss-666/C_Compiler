@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(Part1)
+project(C_Compiler)
 
 set(CMAKE_CXX_STANDARD 14)
 

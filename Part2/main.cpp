@@ -12,15 +12,30 @@ namespace mc
 {
     enum SyntaxKind{
         NumberToken,
+        //" "
         BlankToken,
         IdToken,
+        //int
         IntToken,
+        //return
         RetToken,
+        //{
         OBraceToken,
+        //}
         CBraceToken,
+        //(
         OpToken,
+        //)
         CpToken,
-        SemiToken,//;
+        //;
+        SemiToken,
+        //-
+        NegaToken,
+        //~
+        BComplementToken,
+        //!
+        LogiNegaToken,
+        //others
         BadToken
     };
 
@@ -61,7 +76,7 @@ namespace mc
                     Next();
                 int length=_position-start;
                 string text=_text.substr(start,length);
-                return SyntaxToken(NumberToken,start,text);
+                return SyntaxToken(SyntaxKind::NumberToken,start,text);
             }
             if(isblank(Current()))
             {
@@ -71,7 +86,7 @@ namespace mc
                     Next();
                 int length=_position-start;
                 string text=_text.substr(start,length);
-                return SyntaxToken(BlankToken,start,text);
+                return SyntaxToken(SyntaxKind::BlankToken,start,text);
             }
             if(isalpha(Current()))
             {
@@ -82,17 +97,20 @@ namespace mc
                 int length=_position-start;
                 string text=_text.substr(start,length);
                 if(text=="int")
-                    return SyntaxToken(IntToken,start,text);
+                    return SyntaxToken(SyntaxKind::IntToken,start,text);
                 if(text=="return")
-                    return SyntaxToken(RetToken,start,text);
-                else return SyntaxToken(IdToken,start,text);
+                    return SyntaxToken(SyntaxKind::RetToken,start,text);
+                else return SyntaxToken(SyntaxKind::IdToken,start,text);
             }
-            if(Current()=='{') return SyntaxToken(OBraceToken,_position++,"{");
-            else if(Current()=='}') return SyntaxToken(CBraceToken,_position++,"}");
-            else if(Current()=='(') return SyntaxToken(OpToken,_position++,"(");
-            else if(Current()==')') return SyntaxToken(CpToken,_position++,")");
-            else if(Current()==';') return SyntaxToken(SemiToken,_position++,";");
-            else return SyntaxToken(BadToken,_position++,_text.substr(_position-1,1));
+            if(Current()=='{') return SyntaxToken(SyntaxKind::OBraceToken,_position++,"{");
+            else if(Current()=='}') return SyntaxToken(SyntaxKind::CBraceToken,_position++,"}");
+            else if(Current()=='(') return SyntaxToken(SyntaxKind::OpToken,_position++,"(");
+            else if(Current()==')') return SyntaxToken(SyntaxKind::CpToken,_position++,")");
+            else if(Current()==';') return SyntaxToken(SyntaxKind::SemiToken,_position++,";");
+            else if(Current()=='-') return SyntaxToken(SyntaxKind::NegaToken,_position++,";");
+            else if(Current()=='~') return SyntaxToken(SyntaxKind::BComplementToken,_position++,";");
+            else if(Current()=='!') return SyntaxToken(SyntaxKind::LogiNegaToken,_position++,";");
+            else return SyntaxToken(SyntaxKind::BadToken,_position++,_text.substr(_position-1,1));
         }
     private:
         string _text;
@@ -112,18 +130,20 @@ namespace mc
     class Exp
     {
     public:
+        Exp()= default;
         Exp(string text)
         {
             _text=text;
         }
         string _text;
-        int val;
+        int _val;
+        Exp* _next= nullptr;
     };
 
     class Statement
     {
     public:
-        Statement(){}
+        Statement()= default;
         Statement(StatementType type,Exp* exp)
         {
             _type=type;
@@ -136,7 +156,7 @@ namespace mc
     class Function
     {
     public:
-        Function(){}
+        Function()= default;
         Function(Statement* statement,string name)
         {
             _statement=statement;
@@ -156,6 +176,14 @@ namespace mc
         Function* _function;
     };
 
+    bool isUnaryOp(SyntaxToken* token)
+    {
+        SyntaxKind kind=token->_kind;
+        return kind==SyntaxKind::LogiNegaToken
+        ||kind==SyntaxKind::BComplementToken
+        ||kind==SyntaxKind::NegaToken;
+    }
+
     //语法分析器
     class Parser{
     public:
@@ -164,15 +192,27 @@ namespace mc
             _lexer=lexer;
         }
 
-        //parse the number
+        //parse the expression
         Exp* parse_exp()
         {
             SyntaxToken p=_lexer->NextToken();
-            if (p._kind!=SyntaxKind::NumberToken)
-                fail("exp error1");
 
-            Exp* exp=new Exp(p._text);
-            return exp;
+            if (p._kind==SyntaxKind::NumberToken)
+            {
+                Exp* exp=new Exp(p._text);
+                exp->_val= stoi(exp->_text);
+                return exp;
+            }else if(isUnaryOp(&p))
+            {
+                //get the unary operator
+                Exp* exp=new Exp(p._text);
+                Exp* inner_exp=parse_exp();
+                exp->_next=inner_exp;
+            }else
+            {
+                fail("exp error1");
+            }
+
         }
 
         //parse the statement
@@ -186,7 +226,9 @@ namespace mc
             if(p._kind!=SyntaxKind::RetToken) fail("statement error1");
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
+
             Exp* exp=parse_exp();
+
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
@@ -299,7 +341,7 @@ int main(int argc,char* argv[]) {
         string name=program->_function->_name;
         string val=program->_function->_statement->_exp->_text;
 
-//        cout<<name<<endl<<val;
+//        cout<<name<<endl<<_val;
         ofstream fout("return_2.s");
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
@@ -344,7 +386,7 @@ int main(int argc,char* argv[]) {
 //        ofstream fout("return_2.s");
 //        fout<<" .globl"<<" "<<"_"<<name<<endl;
 //        fout<<"_"<<name<<":"<<endl;
-//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+//        fout<<" movl    $"<<_val<<","<<" %eax"<<endl;
 //        fout<<"ret";
 //        fout.close();
 

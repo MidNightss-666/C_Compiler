@@ -117,7 +117,7 @@ namespace mc
             _text=text;
         }
         string _text;
-        int val;
+        int _val;
     };
 
     class Statement
@@ -299,7 +299,7 @@ int main(int argc,char* argv[]) {
         string name=program->_function->_name;
         string val=program->_function->_statement->_exp->_text;
 
-//        cout<<name<<endl<<val;
+//        cout<<name<<endl<<_val;
         ofstream fout("return_2.s");
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
@@ -344,7 +344,7 @@ int main(int argc,char* argv[]) {
 //        ofstream fout("return_2.s");
 //        fout<<" .globl"<<" "<<"_"<<name<<endl;
 //        fout<<"_"<<name<<":"<<endl;
-//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+//        fout<<" movl    $"<<_val<<","<<" %eax"<<endl;
 //        fout<<"ret";
 //        fout.close();
 
