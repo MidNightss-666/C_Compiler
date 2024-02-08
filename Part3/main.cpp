@@ -451,6 +451,24 @@ namespace mc
 
     void term_out(Term* term,ofstream &fout)
     {
+        if(term== nullptr) return;
+        factor_out(term->_factor,fout);
+        fout<<"    push %eax"<<endl;
+        while (term->_next!= nullptr)
+        {
+            factor_out(term->_next->_factor,fout);
+            fout<<"    pop %ecx"<<endl;
+            if(term->_next->_kind==SyntaxKind::MultiToken)
+                fout<<"    imul %ecx, %eax"<<endl;
+            else if(term->_next->_kind==SyntaxKind::DivToken)
+            {
+                fout<<"    movl %ecx %edx"<<endl;
+                fout<<"    movl %eax %ecx"<<endl;
+                fout<<"    movl %edx %eax"<<endl;
+                fout<<"    cdq"<<endl;
+                fout<<"    idivl %ecx"<<endl;
+            }
+        }
 
     }
 //    <exp> ::= <term> { ("+" | "-") <term> }
@@ -461,6 +479,16 @@ namespace mc
         fout<<"    push %eax"<<endl;
         while (exp->_next!= nullptr)
         {
+            term_out(exp->_next->_term,fout);
+            fout<<"    pop %ecx"<<endl;
+            if(exp->_next->_kind==SyntaxKind::AddToken)
+                fout<<"    addl %ecx, %eax"<<endl;
+            else if(exp->_next->_kind==SyntaxKind::NegaToken)
+            {
+                fout<<"subl %ecx, %eax"<<endl;
+                fout<<"neg     %eax"<<endl;
+            }
+            exp=exp->_next;
 
         }
 
@@ -488,8 +516,8 @@ namespace mc
         Exp* exp=program->_function->_statement->_exp;
         while(exp!=nullptr)
         {
-            exp= exp->_next;
-            cout << exp->_text<<endl;
+//            exp= exp->_next;
+//            cout << exp->_text<<endl;
         }
 
     }
@@ -523,15 +551,14 @@ int main(int argc,char* argv[]) {
         mc::Program* program=parser->parse_program();
 
         string name=program->_function->_name;
-        string val=program->_function->_statement->_exp->_text;
 
 //        cout<<name<<endl<<_val;
-        ofstream fout("return_2.s");
-        fout<<" .globl"<<" "<<name<<endl;
-        fout<<name<<":"<<endl;
-        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
-        fout<<"ret";
-        fout.close();
+//        ofstream fout("return_2.s");
+//        fout<<" .globl"<<" "<<name<<endl;
+//        fout<<name<<":"<<endl;
+//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
+//        fout<<"ret";
+//        fout.close();
 
     }else
     {
@@ -556,22 +583,19 @@ int main(int argc,char* argv[]) {
         }
         fin.close();
 
-        cout<<text<<endl;
+//        cout<<text<<endl;
 
         mc::Lexer* lexer=new mc::Lexer(text);
         mc::Parser* parser=new mc::Parser(lexer);
 
-        //get info of the program
+        //parse the program
         mc::Program* program=parser->parse_program();
 
-        string name=program->_function->_name;
-        string val=program->_function->_statement->_exp->_text;
-
+        //set the file name
         string Filename=filename;
         int length=Filename.length();
         Filename=Filename.substr(0,length-2);
         ofstream fout(Filename+".s");
-        //print
 
 //        fout<<" .globl"<<" "<<name<<endl;
 //        fout<<name<<":"<<endl;
