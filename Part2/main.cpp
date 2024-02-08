@@ -136,11 +136,11 @@ namespace mc
         Return
     };
 
-    class Exp
+    class Factor
     {
     public:
-        Exp()= default;
-        Exp(string text)
+        Factor()= default;
+        Factor(string text)
         {
             _text=text;
         }
@@ -204,7 +204,7 @@ namespace mc
         }
 
         //parse the expression
-        Exp* parse_exp()
+        Exp* parse_factor()
         {
             SyntaxToken p=_lexer->NextToken();
 

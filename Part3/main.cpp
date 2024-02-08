@@ -47,6 +47,7 @@ namespace mc
 
     class SyntaxToken{
     public:
+        SyntaxToken()=default;
         SyntaxToken(SyntaxKind kind,int position,string text=NULL)
         {
             _kind=kind;
@@ -72,8 +73,22 @@ namespace mc
             _position++;
         }
 
+        SyntaxToken Peek()
+        {
+            if(_pflag) return _ptoken;
+            _ptoken=NextToken();
+            _pflag= true;
+            return _ptoken;
+        }
+
         SyntaxToken NextToken()
         {
+            if(_pflag)
+            {
+                _pflag= false;
+                return _ptoken;
+            }
+
             if(isdigit(Current()))
             {
                 int start=_position;
@@ -124,6 +139,8 @@ namespace mc
     private:
         string _text;
         int _position;
+        bool _pflag= false;
+        SyntaxToken _ptoken;
         char Current()
         {
             if(_position>=_text.length())
@@ -135,32 +152,50 @@ namespace mc
     enum StatementType{
         Return
     };
+    class Exp;
 
-    class Exp
+    class Factor
     {
     public:
-        Exp()= default;
-        Exp(string text)
+        Factor()= default;
+        Factor(string text)
         {
             _text=text;
         }
         string _text;
         int _val;
-        Exp* _next= nullptr;
+        Factor* _next= nullptr;
         bool _isdigit= false;
+        Exp* _exp= nullptr;
+    };
+
+    class Term
+    {
+    public:
+        SyntaxKind _kind;//* /
+        Factor* _factor= nullptr;
+        Term* _next= nullptr;
+    };
+
+    class Exp
+    {
+    public:
+        SyntaxKind _kind;//+ -
+        Term* _term= nullptr;
+        Exp* _next= nullptr;
     };
 
     class Statement
     {
     public:
         Statement()= default;
-        Statement(StatementType type,Exp* exp)
+        Statement(StatementType type, Factor* exp)
         {
             _type=type;
             _exp=exp;
         }
         StatementType _type;
-        Exp* _exp;
+        Factor* _exp;
     };
 
     class Function
@@ -203,29 +238,67 @@ namespace mc
             _lexer=lexer;
         }
 
-        //parse the expression
         Exp* parse_exp()
+        {
+            Exp* exp=new Exp();
+            Term* term=parse_term();
+            exp->_term=term;
+            SyntaxToken p= _lexer->Peek();
+            Exp* exp_iter=exp;
+            while(p._kind==SyntaxKind::AddToken||p._kind==SyntaxKind::NegaToken)
+            {
+                _lexer->NextToken();
+                Term* term1=parse_term();
+                Exp* exp1=new Exp();
+                exp1->_kind=p._kind;
+                exp1->_term=term1;
+                exp_iter->_next=exp1;
+                exp_iter=exp_iter->_next;
+                p=_lexer->Peek();
+            }
+
+        }
+
+        Term* parse_term()
+        {
+
+        }
+
+        //parse the factor
+        Factor* parse_factor()
         {
             SyntaxToken p=_lexer->NextToken();
 
             if (p._kind==SyntaxKind::NumberToken)
             {
-                Exp* exp=new Exp(p._text);
-                exp->_val= stoi(exp->_text);
-                exp->_isdigit= true;
-                return exp;
+                //<factor> ::= <int>
+                Factor* pFactor=new Factor(p._text);
+                pFactor->_val= stoi(pFactor->_text);
+                pFactor->_isdigit= true;
+                return pFactor;
             }else if(mc::isUnaryOp(&p))
             {
+                //<factor> ::= <unary_op> <factor>
                 //get the unary operator
-                Exp* exp=new Exp(p._text);
-                Exp* inner_exp=parse_exp();
-                exp->_next=inner_exp;
-                return exp;
-            }else
+                Factor* pFactor=new Factor(p._text);
+                Factor* inner_exp=parse_factor();
+                pFactor->_next=inner_exp;
+                return pFactor;
+            }else if (p._kind==SyntaxKind::OpToken)
             {
-                fail("exp error1");
-            }
+                //<factor> ::= "(" <exp> ")"
+                Exp* exp=parse_exp();
+                p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::CpToken)
+                {
+                    fail("exp error1");
+                }
 
+                Factor* factor=new Factor();
+                factor->_exp=exp;
+                return factor;
+            }
+            else fail("exp error2");
 
         }
 
@@ -241,7 +314,7 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
 
-            Exp* exp=parse_exp();
+            Factor* exp=parse_factor();
 
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
@@ -319,7 +392,7 @@ namespace mc
 
     };
 
-    void exp_out(Exp* exp,ofstream &fout)
+    void exp_out(Factor* exp, ofstream &fout)
     {
         if(exp==NULL) return;
         exp_out(exp->_next,fout);
@@ -344,7 +417,7 @@ namespace mc
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
 
-        Exp* exp=program->_function->_statement->_exp;
+        Factor* exp=program->_function->_statement->_exp;
         exp_out(exp,fout);
         fout<<"ret";
 
@@ -354,7 +427,7 @@ namespace mc
     void pretty_print(Program* program)
     {
         cout<<"program:"<<program->_function->_name<<endl;
-        Exp* exp=program->_function->_statement->_exp;
+        Factor* exp=program->_function->_statement->_exp;
         while(exp!=NULL)
         {
 
