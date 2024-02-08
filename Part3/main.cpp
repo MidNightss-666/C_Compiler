@@ -240,6 +240,7 @@ namespace mc
 
         Exp* parse_exp()
         {
+            //<exp> ::= <term> { ("+" | "-") <term> }
             Exp* exp=new Exp();
             Term* term=parse_term();
             exp->_term=term;
@@ -256,12 +257,30 @@ namespace mc
                 exp_iter=exp_iter->_next;
                 p=_lexer->Peek();
             }
+            return exp;
 
         }
 
         Term* parse_term()
         {
-
+            //<term> ::= <factor> { ("*" | "/") <factor> }
+            Term* term=new Term();
+            Factor* factor=parse_factor();
+            term->_factor=factor;
+            SyntaxToken p= _lexer->Peek();
+            Term* term_iter=term;
+            while(p._kind==SyntaxKind::MultiToken||p._kind==SyntaxKind::DivToken)
+            {
+                _lexer->NextToken();
+                Factor* factor1=parse_factor();
+                Term* term1=new Term();
+                term1->_kind=p._kind;
+                term1->_factor=factor1;
+                term_iter->_next=term1;
+                term_iter=term_iter->_next;
+                p=_lexer->Peek();
+            }
+            return term;
         }
 
         //parse the factor
