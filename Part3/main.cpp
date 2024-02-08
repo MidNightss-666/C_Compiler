@@ -189,13 +189,13 @@ namespace mc
     {
     public:
         Statement()= default;
-        Statement(StatementType type, Factor* exp)
+        Statement(StatementType type, Exp* exp)
         {
             _type=type;
             _exp=exp;
         }
         StatementType _type;
-        Factor* _exp;
+        Exp* _exp;
     };
 
     class Function
@@ -310,14 +310,17 @@ namespace mc
                 p=_lexer->NextToken();
                 if(p._kind!=SyntaxKind::CpToken)
                 {
-                    fail("exp error1");
+                    fail("factor error1");
                 }
 
                 Factor* factor=new Factor();
                 factor->_exp=exp;
                 return factor;
             }
-            else fail("exp error2");
+            else
+            {
+                fail("factor error2");
+            }
 
         }
 
@@ -333,7 +336,7 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
 
-            Factor* exp=parse_factor();
+            Exp* exp=parse_exp();
 
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
@@ -411,22 +414,58 @@ namespace mc
 
     };
 
-    void exp_out(Factor* exp, ofstream &fout)
+//    <program> ::= <function>
+//    <function> ::= "int" <id> "(" ")" "{" <statement> "}"
+//    <statement> ::= "return" <exp> ";"
+//    <exp> ::= <term> { ("+" | "-") <term> }
+//    <term> ::= <factor> { ("*" | "/") <factor> }
+//    <factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
+    void exp_out(Exp* exp, ofstream &fout);
+    void term_out(Term* term,ofstream &fout);
+    void factor_out(Factor* factor,ofstream &fout);
+
+    void factor_out(Factor* factor,ofstream &fout)
     {
-        if(exp==NULL) return;
-        exp_out(exp->_next,fout);
-        if(exp->_text=="-")
+        if(factor== nullptr) return;
+        //<factor> ::= "(" <exp> ")"
+        if(factor->_exp!= nullptr)
+            exp_out(factor->_exp,fout);
+        else if(factor->_next!= nullptr)
+            factor_out(factor->_next,fout);
+        //<factor> ::=  <unary_op> <factor>
+        if(factor->_text=="-")
             fout<<"neg     %eax"<<endl;
-        else if(exp->_text=="~")
+        else if(factor->_text=="~")
             fout<<"not     %eax"<<endl;
-        else if(exp->_text=="!")
+        else if(factor->_text=="!")
         {
             fout<<"cmpl    $0, %eax"<<endl;
             fout<<"movl    $0, %eax"<<endl;
             fout<<"sete    %al"<<endl;
         }
-        else if(exp->_isdigit)
-            fout<<" movl    $"<<exp->_text<<","<<" %eax"<<endl;
+        //<factor> ::= <int>
+        else if(factor->_isdigit)
+            fout<<" movl    $"<<factor->_text<<","<<" %eax"<<endl;
+        //
+    }
+
+    void term_out(Term* term,ofstream &fout)
+    {
+
+    }
+//    <exp> ::= <term> { ("+" | "-") <term> }
+    void exp_out(Exp* exp, ofstream &fout)
+    {
+        if(exp== nullptr) return;
+        term_out(exp->_term,fout);
+        fout<<"    push %eax"<<endl;
+        while (exp->_next!= nullptr)
+        {
+
+        }
+
+
+
     }
 
 
@@ -436,7 +475,7 @@ namespace mc
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
 
-        Factor* exp=program->_function->_statement->_exp;
+        Exp* exp=program->_function->_statement->_exp;
         exp_out(exp,fout);
         fout<<"ret";
 
@@ -446,14 +485,12 @@ namespace mc
     void pretty_print(Program* program)
     {
         cout<<"program:"<<program->_function->_name<<endl;
-        Factor* exp=program->_function->_statement->_exp;
-        while(exp!=NULL)
+        Exp* exp=program->_function->_statement->_exp;
+        while(exp!=nullptr)
         {
-
-            cout << exp->_text<<endl;
             exp= exp->_next;
+            cout << exp->_text<<endl;
         }
-
 
     }
 }

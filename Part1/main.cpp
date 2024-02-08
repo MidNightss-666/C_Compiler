@@ -109,10 +109,10 @@ namespace mc
         Return
     };
 
-    class Factor
+    class Exp
     {
     public:
-        Factor(string text)
+        Exp(string text)
         {
             _text=text;
         }
@@ -165,7 +165,7 @@ namespace mc
         }
 
         //parse the number
-        Exp* parse_factor()
+        Exp* parse_exp()
         {
             SyntaxToken p=_lexer->NextToken();
             if (p._kind!=SyntaxKind::NumberToken)
