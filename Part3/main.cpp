@@ -62,6 +62,12 @@ namespace mc
     //词法分析器
     class Lexer{
     public:
+        //Test Func
+        int show_pos()
+        {
+            return _position;
+        }
+
         Lexer(string text)
         {
             _text=text;
@@ -245,6 +251,11 @@ namespace mc
             Term* term=parse_term();
             exp->_term=term;
             SyntaxToken p= _lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
             Exp* exp_iter=exp;
             while(p._kind==SyntaxKind::AddToken||p._kind==SyntaxKind::NegaToken)
             {
@@ -255,6 +266,10 @@ namespace mc
                 exp1->_term=term1;
                 exp_iter->_next=exp1;
                 exp_iter=exp_iter->_next;
+                p=_lexer->Peek();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
                 p=_lexer->Peek();
             }
             return exp;
@@ -268,6 +283,11 @@ namespace mc
             Factor* factor=parse_factor();
             term->_factor=factor;
             SyntaxToken p= _lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
             Term* term_iter=term;
             while(p._kind==SyntaxKind::MultiToken||p._kind==SyntaxKind::DivToken)
             {
@@ -279,6 +299,10 @@ namespace mc
                 term_iter->_next=term1;
                 term_iter=term_iter->_next;
                 p=_lexer->Peek();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                p=_lexer->Peek();
             }
             return term;
         }
@@ -287,6 +311,8 @@ namespace mc
         Factor* parse_factor()
         {
             SyntaxToken p=_lexer->NextToken();
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
 
             if (p._kind==SyntaxKind::NumberToken)
             {
@@ -319,6 +345,10 @@ namespace mc
             }
             else
             {
+                //test
+                cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
+                cout<<"kind:"<<p._kind<<"text:"<<p._text;
+
                 fail("factor error2");
             }
 
@@ -341,6 +371,10 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
+//            //test
+//            cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
+//            cout<<"kind:"<<p._kind<<"text:"<<p._text;
+
             if(p._kind!=SyntaxKind::SemiToken) fail("statement error3");
 
             Statement* statement=new Statement(StatementType::Return,exp);
@@ -449,25 +483,28 @@ namespace mc
         //
     }
 
+//    <term> ::= <factor> { ("*" | "/") <factor> }
     void term_out(Term* term,ofstream &fout)
     {
         if(term== nullptr) return;
         factor_out(term->_factor,fout);
-        fout<<"    push %eax"<<endl;
+
         while (term->_next!= nullptr)
         {
+            fout<<"    push %eax"<<endl;
             factor_out(term->_next->_factor,fout);
             fout<<"    pop %ecx"<<endl;
             if(term->_next->_kind==SyntaxKind::MultiToken)
                 fout<<"    imul %ecx, %eax"<<endl;
             else if(term->_next->_kind==SyntaxKind::DivToken)
             {
-                fout<<"    movl %ecx %edx"<<endl;
-                fout<<"    movl %eax %ecx"<<endl;
-                fout<<"    movl %edx %eax"<<endl;
+                fout<<"    movl %ecx, %edx"<<endl;
+                fout<<"    movl %eax, %ecx"<<endl;
+                fout<<"    movl %edx, %eax"<<endl;
                 fout<<"    cdq"<<endl;
                 fout<<"    idivl %ecx"<<endl;
             }
+            term=term->_next;
         }
 
     }
@@ -476,9 +513,10 @@ namespace mc
     {
         if(exp== nullptr) return;
         term_out(exp->_term,fout);
-        fout<<"    push %eax"<<endl;
+
         while (exp->_next!= nullptr)
         {
+            fout<<"    push %eax"<<endl;
             term_out(exp->_next->_term,fout);
             fout<<"    pop %ecx"<<endl;
             if(exp->_next->_kind==SyntaxKind::AddToken)
@@ -583,7 +621,7 @@ int main(int argc,char* argv[]) {
         }
         fin.close();
 
-//        cout<<text<<endl;
+        cout<<text<<endl;
 
         mc::Lexer* lexer=new mc::Lexer(text);
         mc::Parser* parser=new mc::Parser(lexer);
@@ -607,7 +645,7 @@ int main(int argc,char* argv[]) {
         string command="gcc ";
 
         command.append(Filename+".s -o ").append(Filename);
-        system(command.c_str());
+//        system(command.c_str());
     }
 
     return 0;
