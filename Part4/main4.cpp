@@ -213,7 +213,7 @@ namespace mc
     enum StatementType{
         Return
     };
-    class Exp;
+    class AddExp;
 
     class Factor
     {
@@ -227,7 +227,7 @@ namespace mc
         int _val;
         Factor* _next= nullptr;
         bool _isdigit= false;
-        Exp* _exp= nullptr;
+        AddExp* _exp= nullptr;
     };
 
     class Term
@@ -238,25 +238,58 @@ namespace mc
         Term* _next= nullptr;
     };
 
-    class Exp
+    class AddExp
     {
     public:
         SyntaxKind _kind;//+ -
         Term* _term= nullptr;
-        Exp* _next= nullptr;
+        AddExp* _next= nullptr;
     };
+
+    class RelationalExp
+    {
+    public:
+        SyntaxKind _kind;//"<" | ">" | "<=" | ">="
+        AddExp* _addexp;
+        RelationalExp* _next;
+    };
+
+    class EqualityExp
+    {
+    public:
+        SyntaxKind _kind;// == !=
+        RelationalExp* _relationalexp;
+        EqualityExp* _next;
+    };
+
+    class LAndExp
+    {
+    public:
+        SyntaxKind _kind;// &&
+        EqualityExp* _equalityexp;
+        LAndExp* _next;
+    };
+
+    class Exp
+    {
+    public:
+        SyntaxKind _kind;// "||"
+        LAndExp* _landexp;
+        Exp* _next;
+    };
+
 
     class Statement
     {
     public:
         Statement()= default;
-        Statement(StatementType type, Exp* exp)
+        Statement(StatementType type, AddExp* exp)
         {
             _type=type;
             _exp=exp;
         }
         StatementType _type;
-        Exp* _exp;
+        AddExp* _exp;
     };
 
     class Function
@@ -299,10 +332,10 @@ namespace mc
             _lexer=lexer;
         }
 
-        Exp* parse_exp()
+        AddExp* parse_exp()
         {
             //<exp> ::= <term> { ("+" | "-") <term> }
-            Exp* exp=new Exp();
+            AddExp* exp=new AddExp();
             Term* term=parse_term();
             exp->_term=term;
             SyntaxToken p= _lexer->Peek();
@@ -311,12 +344,12 @@ namespace mc
                 p=_lexer->NextToken();
             p=_lexer->Peek();
 
-            Exp* exp_iter=exp;
+            AddExp* exp_iter=exp;
             while(p._kind==SyntaxKind::AddToken||p._kind==SyntaxKind::NegaToken)
             {
                 _lexer->NextToken();
                 Term* term1=parse_term();
-                Exp* exp1=new Exp();
+                AddExp* exp1=new AddExp();
                 exp1->_kind=p._kind;
                 exp1->_term=term1;
                 exp_iter->_next=exp1;
@@ -387,7 +420,7 @@ namespace mc
             }else if (p._kind==SyntaxKind::OpToken)
             {
                 //<factor> ::= "(" <exp> ")"
-                Exp* exp=parse_exp();
+                AddExp* exp=parse_exp();
                 p=_lexer->NextToken();
                 if(p._kind!=SyntaxKind::CpToken)
                 {
@@ -421,7 +454,7 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
 
-            Exp* exp=parse_exp();
+            AddExp* exp=parse_exp();
 
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
@@ -509,7 +542,7 @@ namespace mc
 //    <exp> ::= <term> { ("+" | "-") <term> }
 //    <term> ::= <factor> { ("*" | "/") <factor> }
 //    <factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
-    void exp_out(Exp* exp, ofstream &fout);
+    void exp_out(AddExp* exp, ofstream &fout);
     void term_out(Term* term,ofstream &fout);
     void factor_out(Factor* factor,ofstream &fout);
 
@@ -564,7 +597,7 @@ namespace mc
 
     }
 //    <exp> ::= <term> { ("+" | "-") <term> }
-    void exp_out(Exp* exp, ofstream &fout)
+    void exp_out(AddExp* exp, ofstream &fout)
     {
         if(exp== nullptr) return;
         term_out(exp->_term,fout);
@@ -596,7 +629,7 @@ namespace mc
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
 
-        Exp* exp=program->_function->_statement->_exp;
+        AddExp* exp=program->_function->_statement->_exp;
         exp_out(exp,fout);
         fout<<"ret";
 
@@ -606,7 +639,7 @@ namespace mc
     void pretty_print(Program* program)
     {
         cout<<"program:"<<program->_function->_name<<endl;
-        Exp* exp=program->_function->_statement->_exp;
+        AddExp* exp=program->_function->_statement->_exp;
         while(exp!=nullptr)
         {
 //            exp= exp->_next;
