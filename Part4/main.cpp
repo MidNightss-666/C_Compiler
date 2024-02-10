@@ -332,7 +332,143 @@ namespace mc
             _lexer=lexer;
         }
 
-        AddExp* parse_exp()
+        Exp* parse_Exp()
+        {
+            //<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+            Exp* exp=new Exp();
+            LAndExp* lAndExp=parse_LAndExp();
+            exp->_landexp=lAndExp;
+            SyntaxToken p= _lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
+            Exp* exp_iter=exp;
+            while(p._kind==SyntaxKind::OrToken)
+            {
+                //another logical-and-exp
+
+                _lexer->NextToken();
+                LAndExp* lAndExp1=parse_LAndExp();
+                Exp* exp1=new Exp();
+                exp1->_kind=p._kind;
+                exp1->_landexp=lAndExp;
+                exp_iter->_next=exp1;
+                exp_iter=exp_iter->_next;
+                p=_lexer->Peek();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            return exp;
+        }
+
+        LAndExp* parse_LAndExp()
+        {
+            //<logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
+            LAndExp* lAndExp=new LAndExp();
+            EqualityExp* equalityExp=parse_EqualityExp();
+            lAndExp->_equalityexp=equalityExp;
+            SyntaxToken p= _lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
+            LAndExp* exp_iter=lAndExp;
+            while(p._kind==SyntaxKind::AndToken)
+            {
+                //another equality-exp
+
+                _lexer->NextToken();
+                EqualityExp* equalityExp1=parse_EqualityExp();
+                LAndExp* lAndExp1=new LAndExp();
+                lAndExp1->_kind=p._kind;
+                lAndExp1->_equalityexp=equalityExp1;
+                exp_iter->_next=lAndExp1;
+                exp_iter=exp_iter->_next;
+                p=_lexer->Peek();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            return lAndExp;
+        }
+
+        EqualityExp* parse_EqualityExp()
+        {
+            //<equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
+            EqualityExp* equalityExp=new EqualityExp();
+            RelationalExp* relationalExp=parse_RelationalExp();
+            equalityExp->_relationalexp=relationalExp;
+            SyntaxToken p= _lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
+            EqualityExp* exp_iter=equalityExp;
+            while(p._kind==SyntaxKind::EqualToken||p._kind==SyntaxKind::NequalToken)
+            {
+                //another relational-exp
+
+                _lexer->NextToken();
+                RelationalExp* relationalExp1=parse_RelationalExp();
+                EqualityExp* equalityExp1=new EqualityExp();
+                equalityExp1->_kind=p._kind;
+                equalityExp1->_relationalexp=relationalExp1;
+                exp_iter->_next=equalityExp1;
+                exp_iter=exp_iter->_next;
+                p=_lexer->Peek();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            return equalityExp;
+
+
+
+        }
+
+        RelationalExp* parse_RelationalExp()
+        {
+            //<relational-exp> ::= <additive-exp> { ("<" | ">" | "<=" | ">=") <additive-exp> }
+            RelationalExp* relationalExp=new RelationalExp();
+            AddExp* addExp=parse_AddExp();
+            relationalExp->_addexp=addExp;
+            SyntaxToken p= _lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
+            RelationalExp* exp_iter=relationalExp;
+            while(p._kind==SyntaxKind::LthanToken||p._kind==SyntaxKind::GthanToken
+                ||p._kind==SyntaxKind::LEthanToken||p._kind==SyntaxKind::GEthanToken)
+            {
+                //another additive-exp
+
+                _lexer->NextToken();
+                AddExp* addExp1=parse_AddExp();
+                RelationalExp* relationalExp1=new RelationalExp();
+                relationalExp1->_kind=p._kind;
+                relationalExp1->_addexp=addExp1;
+                exp_iter->_next=relationalExp1;
+                exp_iter=exp_iter->_next;
+                p=_lexer->Peek();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            return relationalExp;
+        }
+
+        AddExp* parse_AddExp()
         {
             //<exp> ::= <term> { ("+" | "-") <term> }
             AddExp* exp=new AddExp();
@@ -420,7 +556,7 @@ namespace mc
             }else if (p._kind==SyntaxKind::OpToken)
             {
                 //<factor> ::= "(" <exp> ")"
-                AddExp* exp=parse_exp();
+                AddExp* exp=parse_AddExp();
                 p=_lexer->NextToken();
                 if(p._kind!=SyntaxKind::CpToken)
                 {
@@ -439,6 +575,7 @@ namespace mc
 
                 fail("factor error2");
             }
+            return nullptr;
 
         }
 
@@ -454,7 +591,7 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
 
-            AddExp* exp=parse_exp();
+            AddExp* exp=parse_AddExp();
 
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)

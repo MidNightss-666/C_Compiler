@@ -215,29 +215,29 @@ F_/C_Compiler/Part3/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part3.dir\build.make CMakeFiles/Part3.dir/F_/C_Compiler/Part3/main.cpp.s
 .PHONY : F_/C_Compiler/Part3/main.cpp.s
 
-F_/C_Compiler/Part4/main4.obj: F_/C_Compiler/Part4/main4.cpp.obj
-.PHONY : F_/C_Compiler/Part4/main4.obj
+F_/C_Compiler/Part4/main.obj: F_/C_Compiler/Part4/main.cpp.obj
+.PHONY : F_/C_Compiler/Part4/main.obj
 
 # target to build an object file
-F_/C_Compiler/Part4/main4.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main4.cpp.obj
-.PHONY : F_/C_Compiler/Part4/main4.cpp.obj
+F_/C_Compiler/Part4/main.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main.cpp.obj
+.PHONY : F_/C_Compiler/Part4/main.cpp.obj
 
-F_/C_Compiler/Part4/main4.i: F_/C_Compiler/Part4/main4.cpp.i
-.PHONY : F_/C_Compiler/Part4/main4.i
+F_/C_Compiler/Part4/main.i: F_/C_Compiler/Part4/main.cpp.i
+.PHONY : F_/C_Compiler/Part4/main.i
 
 # target to preprocess a source file
-F_/C_Compiler/Part4/main4.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main4.cpp.i
-.PHONY : F_/C_Compiler/Part4/main4.cpp.i
+F_/C_Compiler/Part4/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main.cpp.i
+.PHONY : F_/C_Compiler/Part4/main.cpp.i
 
-F_/C_Compiler/Part4/main4.s: F_/C_Compiler/Part4/main4.cpp.s
-.PHONY : F_/C_Compiler/Part4/main4.s
+F_/C_Compiler/Part4/main.s: F_/C_Compiler/Part4/main.cpp.s
+.PHONY : F_/C_Compiler/Part4/main.s
 
 # target to generate assembly for a file
-F_/C_Compiler/Part4/main4.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main4.cpp.s
-.PHONY : F_/C_Compiler/Part4/main4.cpp.s
+F_/C_Compiler/Part4/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main.cpp.s
+.PHONY : F_/C_Compiler/Part4/main.cpp.s
 
 main.obj: main.cpp.obj
 .PHONY : main.obj
@@ -281,9 +281,9 @@ help:
 	@echo ... F_/C_Compiler/Part3/main.obj
 	@echo ... F_/C_Compiler/Part3/main.i
 	@echo ... F_/C_Compiler/Part3/main.s
-	@echo ... F_/C_Compiler/Part4/main4.obj
-	@echo ... F_/C_Compiler/Part4/main4.i
-	@echo ... F_/C_Compiler/Part4/main4.s
+	@echo ... F_/C_Compiler/Part4/main.obj
+	@echo ... F_/C_Compiler/Part4/main.i
+	@echo ... F_/C_Compiler/Part4/main.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
