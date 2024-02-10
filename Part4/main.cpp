@@ -213,7 +213,7 @@ namespace mc
     enum StatementType{
         Return
     };
-    class AddExp;
+    class Exp;
 
     class Factor
     {
@@ -227,7 +227,7 @@ namespace mc
         int _val;
         Factor* _next= nullptr;
         bool _isdigit= false;
-        AddExp* _exp= nullptr;
+        Exp* _exp= nullptr;
     };
 
     class Term
@@ -283,13 +283,13 @@ namespace mc
     {
     public:
         Statement()= default;
-        Statement(StatementType type, AddExp* exp)
+        Statement(StatementType type, Exp* exp)
         {
             _type=type;
             _exp=exp;
         }
         StatementType _type;
-        AddExp* _exp;
+        Exp* _exp;
     };
 
     class Function
@@ -429,9 +429,6 @@ namespace mc
                 p=_lexer->Peek();
             }
             return equalityExp;
-
-
-
         }
 
         RelationalExp* parse_RelationalExp()
@@ -497,7 +494,6 @@ namespace mc
                 p=_lexer->Peek();
             }
             return exp;
-
         }
 
         Term* parse_term()
@@ -556,13 +552,12 @@ namespace mc
             }else if (p._kind==SyntaxKind::OpToken)
             {
                 //<factor> ::= "(" <exp> ")"
-                AddExp* exp=parse_AddExp();
+                Exp* exp=parse_Exp();
                 p=_lexer->NextToken();
                 if(p._kind!=SyntaxKind::CpToken)
                 {
                     fail("factor error1");
                 }
-
                 Factor* factor=new Factor();
                 factor->_exp=exp;
                 return factor;
@@ -591,7 +586,7 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
 
-            AddExp* exp=parse_AddExp();
+            Exp* exp=parse_Exp();
 
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
@@ -673,16 +668,46 @@ namespace mc
 
     };
 
-//    <program> ::= <function>
-//    <function> ::= "int" <id> "(" ")" "{" <statement> "}"
-//    <statement> ::= "return" <exp> ";"
-//    <exp> ::= <term> { ("+" | "-") <term> }
-//    <term> ::= <factor> { ("*" | "/") <factor> }
-//    <factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
-    void exp_out(AddExp* exp, ofstream &fout);
+//<program> ::= <function>
+//<function> ::= "int" <id> "(" ")" "{" <statement> "}"
+//<statement> ::= "return" <exp> ";"
+//<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+//<logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
+//<equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
+//<relational-exp> ::= <additive-exp> { ("<" | ">" | "<=" | ">=") <additive-exp> }
+//<additive-exp> ::= <term> { ("+" | "-") <term> }
+//<term> ::= <factor> { ("*" | "/") <factor> }
+//<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
+//<unary_op> ::= "!" | "~" | "-"
+
+    void exp_out(Exp* exp, ofstream &fout);
+    void landexp_out(LAndExp* exp, ofstream &fout);
+    void equalityexp_out(EqualityExp* exp, ofstream &fout);
+    void relationalexp_out(RelationalExp* exp, ofstream &fout);
+    void addexp_out(AddExp* exp, ofstream &fout);
     void term_out(Term* term,ofstream &fout);
     void factor_out(Factor* factor,ofstream &fout);
 
+    void exp_out(Exp* exp, ofstream &fout)
+    {
+
+    }
+
+    void landexp_out(LAndExp* exp, ofstream &fout)
+    {
+
+    }
+
+    void equalityexp_out(EqualityExp* exp, ofstream &fout)
+    {
+
+    }
+
+    void relationalexp_out(RelationalExp* relationalExp, ofstream &fout)
+    {
+
+    }
+    //<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
     void factor_out(Factor* factor,ofstream &fout)
     {
         if(factor== nullptr) return;
@@ -733,32 +758,28 @@ namespace mc
         }
 
     }
-//    <exp> ::= <term> { ("+" | "-") <term> }
-    void exp_out(AddExp* exp, ofstream &fout)
+//    <additive-exp> ::= <term> { ("+" | "-") <term> }
+    void addexp_out(AddExp* addExp, ofstream &fout)
     {
-        if(exp== nullptr) return;
-        term_out(exp->_term,fout);
+        if(addExp== nullptr) return;
+        term_out(addExp->_term,fout);
 
-        while (exp->_next!= nullptr)
+        while (addExp->_next!= nullptr)
         {
             fout<<"    push %eax"<<endl;
-            term_out(exp->_next->_term,fout);
+            term_out(addExp->_next->_term,fout);
             fout<<"    pop %ecx"<<endl;
-            if(exp->_next->_kind==SyntaxKind::AddToken)
+            if(addExp->_next->_kind==SyntaxKind::AddToken)
                 fout<<"    addl %ecx, %eax"<<endl;
-            else if(exp->_next->_kind==SyntaxKind::NegaToken)
+            else if(addExp->_next->_kind==SyntaxKind::NegaToken)
             {
                 fout<<"subl %ecx, %eax"<<endl;
                 fout<<"neg     %eax"<<endl;
             }
-            exp=exp->_next;
+            addExp=addExp->_next;
 
         }
-
-
-
     }
-
 
     void aOut(Program* program,ofstream &fout)
     {
@@ -766,17 +787,17 @@ namespace mc
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
 
-        AddExp* exp=program->_function->_statement->_exp;
+        Exp* exp=program->_function->_statement->_exp;
         exp_out(exp,fout);
         fout<<"ret";
 
         fout.close();
     }
 
-    void pretty_print(Program* program)
+    __attribute__((unused)) void pretty_print(Program* program)
     {
         cout<<"program:"<<program->_function->_name<<endl;
-        AddExp* exp=program->_function->_statement->_exp;
+        Exp* exp=program->_function->_statement->_exp;
         while(exp!=nullptr)
         {
 //            exp= exp->_next;
@@ -786,92 +807,49 @@ namespace mc
     }
 }
 
-
-
 int main(int argc,char* argv[]) {
     int test=0;
-    if(test)
+    if(argc<2)
     {
-        ifstream fin;
-        fin.open(R"(F:\C_Compiler\Part1\return_2.c)",ios::in);
-        if(!fin.is_open())
-        {
-            cout<<"failed when opening file";
-            exit(EXIT_FAILURE);
-        }
-        string buff;
-        string text="";
-        while(getline(fin,buff))
-        {
-            text.append(buff);
-        }
-        fin.close();
-
-        mc::Lexer* lexer=new mc::Lexer(text);
-        mc::Parser* parser=new mc::Parser(lexer);
-
-        //get info of the program
-        mc::Program* program=parser->parse_program();
-
-        string name=program->_function->_name;
-
-//        cout<<name<<endl<<_val;
-//        ofstream fout("return_2.s");
-//        fout<<" .globl"<<" "<<name<<endl;
-//        fout<<name<<":"<<endl;
-//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
-//        fout<<"ret";
-//        fout.close();
-
-    }else
-    {
-        if(argc<2)
-        {
-            cout<<"invalid usage"<<endl;
-            return 1;
-        }
-        const char* filename=argv[1];
-        ifstream fin;
-        fin.open(filename,ios::in);
-        if(!fin.is_open())
-        {
-            cout<<"failed when opening file";
-            exit(EXIT_FAILURE);
-        }
-        string buff;
-        string text="";
-        while(getline(fin,buff))
-        {
-            text.append(buff+" ");
-        }
-        fin.close();
-
-        cout<<text<<endl;
-
-        mc::Lexer* lexer=new mc::Lexer(text);
-        mc::Parser* parser=new mc::Parser(lexer);
-
-        //parse the program
-        mc::Program* program=parser->parse_program();
-
-        //set the file name
-        string Filename=filename;
-        int length=Filename.length();
-        Filename=Filename.substr(0,length-2);
-        ofstream fout(Filename+".s");
-
-//        fout<<" .globl"<<" "<<name<<endl;
-//        fout<<name<<":"<<endl;
-//        fout<<" movl    $"<<val<<","<<" %eax"<<endl;
-//        fout<<"ret";
-//        fout.close();
-//        mc::pretty_print(program);
-        mc::aOut(program,fout);
-        string command="gcc ";
-
-        command.append(Filename+".s -o ").append(Filename);
-//        system(command.c_str());
+        cout<<"invalid usage"<<endl;
+        return 1;
     }
+    const char* filename=argv[1];
+    ifstream fin;
+    fin.open(filename,ios::in);
+    if(!fin.is_open())
+    {
+        cout<<"failed when opening file";
+        exit(EXIT_FAILURE);
+    }
+    string buff;
+    string text="";
+    while(getline(fin,buff))
+    {
+        text.append(buff+" ");
+    }
+    fin.close();
+
+    cout<<text<<endl;
+
+    mc::Lexer* lexer=new mc::Lexer(text);
+    mc::Parser* parser=new mc::Parser(lexer);
+
+    //parse the program
+    mc::Program* program=parser->parse_program();
+
+    //set the file name
+    string Filename=filename;
+    int length=Filename.length();
+    Filename=Filename.substr(0,length-2);
+    ofstream fout(Filename+".s");
+
+    mc::aOut(program,fout);
+    string command="gcc ";
+
+    command.append(Filename+".s -o ").append(Filename);
+//        system(command.c_str());
+
 
     return 0;
 }

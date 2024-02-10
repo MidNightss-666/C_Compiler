@@ -548,7 +548,7 @@ namespace mc
         fout.close();
     }
 
-    void pretty_print(Program* program)
+    __attribute__((unused)) void pretty_print(Program* program)
     {
         cout<<"program:"<<program->_function->_name<<endl;
         Exp* exp=program->_function->_statement->_exp;
