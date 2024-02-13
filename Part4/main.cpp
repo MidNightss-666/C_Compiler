@@ -61,6 +61,8 @@ namespace mc
         GthanToken,
         //>=
         GEthanToken,
+        //unset
+        Unset,
         //others
         BadToken
     };
@@ -241,7 +243,7 @@ namespace mc
     class AddExp
     {
     public:
-        SyntaxKind _kind;//+ -
+        SyntaxKind _kind=SyntaxKind::Unset;//+ -
         Term* _term= nullptr;
         AddExp* _next= nullptr;
     };
@@ -249,33 +251,33 @@ namespace mc
     class RelationalExp
     {
     public:
-        SyntaxKind _kind;//"<" | ">" | "<=" | ">="
-        AddExp* _addexp;
-        RelationalExp* _next;
+        SyntaxKind _kind=SyntaxKind::Unset;//"<" | ">" | "<=" | ">="
+        AddExp* _addexp= nullptr;
+        RelationalExp* _next= nullptr;
     };
 
     class EqualityExp
     {
     public:
-        SyntaxKind _kind;// == !=
-        RelationalExp* _relationalexp;
-        EqualityExp* _next;
+        SyntaxKind _kind=SyntaxKind::Unset;// == !=
+        RelationalExp* _relationalexp= nullptr;
+        EqualityExp* _next= nullptr;
     };
 
     class LAndExp
     {
     public:
-        SyntaxKind _kind;// &&
-        EqualityExp* _equalityexp;
-        LAndExp* _next;
+        SyntaxKind _kind=SyntaxKind::Unset;// &&
+        EqualityExp* _equalityexp= nullptr;
+        LAndExp* _next= nullptr;
     };
 
     class Exp
     {
     public:
-        SyntaxKind _kind;// "||"
-        LAndExp* _landexp;
-        Exp* _next;
+        SyntaxKind _kind=SyntaxKind::Unset;// "||"
+        LAndExp* _landexp= nullptr;
+        Exp* _next= nullptr;
     };
 
 
@@ -289,7 +291,7 @@ namespace mc
             _exp=exp;
         }
         StatementType _type;
-        Exp* _exp;
+        Exp* _exp= nullptr;
     };
 
     class Function
@@ -301,7 +303,7 @@ namespace mc
             _statement=statement;
             _name=name;
         }
-        Statement* _statement;
+        Statement* _statement= nullptr;
         //函数名称
         string _name;
     };
@@ -313,7 +315,7 @@ namespace mc
         {
             _function=function;
         }
-        Function* _function;
+        Function* _function= nullptr;
     };
 
     bool isUnaryOp(SyntaxToken* token)
@@ -668,6 +670,25 @@ namespace mc
 
     };
 
+    string clause_counter()
+    {
+        static int cnt=0;
+        string ret="_clause";
+        ret.append(to_string(cnt));
+        cnt++;
+        return ret;
+    }
+
+    string return_counter()
+    {
+        static int cnt=0;
+        string ret="_return";
+        ret.append(to_string(cnt));
+        cnt++;
+        return ret;
+    }
+
+
 //<program> ::= <function>
 //<function> ::= "int" <id> "(" ")" "{" <statement> "}"
 //<statement> ::= "return" <exp> ";"
@@ -684,30 +705,137 @@ namespace mc
     void landexp_out(LAndExp* exp, ofstream &fout);
     void equalityexp_out(EqualityExp* exp, ofstream &fout);
     void relationalexp_out(RelationalExp* exp, ofstream &fout);
-    void addexp_out(AddExp* exp, ofstream &fout);
+    void addexp_out(AddExp* addExp, ofstream &fout);
     void term_out(Term* term,ofstream &fout);
     void factor_out(Factor* factor,ofstream &fout);
 
+//<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
     void exp_out(Exp* exp, ofstream &fout)
     {
+        if (exp== nullptr) return;
+        landexp_out(exp->_landexp,fout);
+
+        string return_flag=return_counter();
+        while (exp->_next!= nullptr)
+        {
+            fout<<"    cmpl $0, %eax"<<endl; //cmp e1 and false
+
+            string clause_flag=clause_counter();
+
+
+            fout<<"    je "<<clause_flag<<endl; //jump if e1 equals false
+            fout<<"    movl $1, %eax"<<endl; //else set ret true
+            fout<<"    jmp "<<return_flag<<endl;//jump to _end
+            fout<<clause_flag<<":"<<endl;
+            landexp_out(exp->_next->_landexp,fout);//next bool expression
+            exp=exp->_next;
+        }
+        //last bool expression finished, and don't jump to the end
+
+        fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
+        fout<<"    movl $0, %eax"<<endl;
+        fout<<"    setne %al"<<endl;//set %eax true if not equal to false (of course!)
+        fout<<return_flag<<":"<<endl;
 
     }
 
+//<logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
     void landexp_out(LAndExp* exp, ofstream &fout)
     {
+        if (exp== nullptr) return;
+        equalityexp_out(exp->_equalityexp,fout);
+
+        string return_flag=return_counter();
+        while (exp->_next!= nullptr)
+        {
+            fout<<"    cmpl $0, %eax"<<endl;
+
+            string clause_flag=clause_counter();
+
+            fout<<"    jne "<<clause_flag<<endl; //jump to the next expression e2 if e1 is true
+            fout<<"    jmp "<<return_flag<<endl;//otherwise jump to the end
+            fout<<clause_flag<<":"<<endl;
+            equalityexp_out(exp->_next->_equalityexp,fout);//next bool expression
+            exp=exp->_next;
+        }
+        //last bool expression finished, and don't jump to the end yet
+
+        fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
+        fout<<"    movl $0, %eax"<<endl;
+        fout<<"    setne %al"<<endl;//set %eax true if not equal to false
+        fout<<return_flag<<":"<<endl;
 
     }
 
+//<equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
     void equalityexp_out(EqualityExp* exp, ofstream &fout)
     {
+        if (exp== nullptr) return;
+        relationalexp_out(exp->_relationalexp,fout);
+        while(exp->_next!= nullptr)
+        {
+            fout<<"    push %eax"<<endl;
+            relationalexp_out(exp->_next->_relationalexp,fout);
+            fout<<"    pop %ecx"<<endl;
+            if(exp->_next->_kind==SyntaxKind::EqualToken)
+            {
+                fout<<"     cmpl   %eax, %ecx"<<endl;
+                fout<<"     movl   $0, %eax"<<endl;
+                fout<<"     sete   %al"<<endl;
+            }else if (exp->_next->_kind==SyntaxKind::NequalToken)
+            {
+                fout<<"     cmpl   %eax, %ecx"<<endl;
+                fout<<"     movl   $0, %eax"<<endl;
+                fout<<"     setne   %al"<<endl;
+            }
+
+            exp=exp->_next;
+        }
 
     }
 
-    void relationalexp_out(RelationalExp* relationalExp, ofstream &fout)
+//<relational-exp> ::= <additive-exp> { ("<" | ">" | "<=" | ">=") <additive-exp> }
+    void relationalexp_out(RelationalExp* exp, ofstream &fout)
     {
+        if (exp== nullptr) return;
+        addexp_out(exp->_addexp,fout);
+        while(exp->_next!= nullptr)
+        {
+            fout<<"    push %eax"<<endl;
+            addexp_out(exp->_next->_addexp,fout);
+            fout<<"    pop %ecx"<<endl;
+            if(exp->_next->_kind==SyntaxKind::LthanToken)
+            {
+                //"<"
+                fout<<"     cmpl   %eax, %ecx"<<endl;
+                fout<<"     movl   $0, %eax"<<endl;
+                fout<<"     setl   %al"<<endl;
+            }else if (exp->_next->_kind==SyntaxKind::LEthanToken)
+            {
+                //"<="
+                fout<<"     cmpl   %eax, %ecx"<<endl;
+                fout<<"     movl   $0, %eax"<<endl;
+                fout<<"     setle   %al"<<endl;
+            }else if (exp->_next->_kind==SyntaxKind::GthanToken)
+            {
+                //">"
+                fout<<"     cmpl   %eax, %ecx"<<endl;
+                fout<<"     movl   $0, %eax"<<endl;
+                fout<<"     setg   %al"<<endl;
+            }else if (exp->_next->_kind==SyntaxKind::GEthanToken)
+            {
+                //">="
+                fout<<"     cmpl   %eax, %ecx"<<endl;
+                fout<<"     movl   $0, %eax"<<endl;
+                fout<<"     setge   %al"<<endl;
+            }
+
+            exp=exp->_next;
+        }
 
     }
-    //<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
+
+//<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
     void factor_out(Factor* factor,ofstream &fout)
     {
         if(factor== nullptr) return;
