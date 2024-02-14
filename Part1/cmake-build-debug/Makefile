@@ -167,6 +167,19 @@ Part4/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/build
 .PHONY : Part4/fast
 
+#=============================================================================
+# Target rules for targets named Part5
+
+# Build rule for target.
+Part5: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 Part5
+.PHONY : Part5
+
+# fast build rule for target.
+Part5/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part5.dir\build.make CMakeFiles/Part5.dir/build
+.PHONY : Part5/fast
+
 F_/C_Compiler/Part2/main.obj: F_/C_Compiler/Part2/main.cpp.obj
 .PHONY : F_/C_Compiler/Part2/main.obj
 
@@ -239,6 +252,30 @@ F_/C_Compiler/Part4/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part4.dir\build.make CMakeFiles/Part4.dir/F_/C_Compiler/Part4/main.cpp.s
 .PHONY : F_/C_Compiler/Part4/main.cpp.s
 
+F_/C_Compiler/Part5/main.obj: F_/C_Compiler/Part5/main.cpp.obj
+.PHONY : F_/C_Compiler/Part5/main.obj
+
+# target to build an object file
+F_/C_Compiler/Part5/main.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part5.dir\build.make CMakeFiles/Part5.dir/F_/C_Compiler/Part5/main.cpp.obj
+.PHONY : F_/C_Compiler/Part5/main.cpp.obj
+
+F_/C_Compiler/Part5/main.i: F_/C_Compiler/Part5/main.cpp.i
+.PHONY : F_/C_Compiler/Part5/main.i
+
+# target to preprocess a source file
+F_/C_Compiler/Part5/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part5.dir\build.make CMakeFiles/Part5.dir/F_/C_Compiler/Part5/main.cpp.i
+.PHONY : F_/C_Compiler/Part5/main.cpp.i
+
+F_/C_Compiler/Part5/main.s: F_/C_Compiler/Part5/main.cpp.s
+.PHONY : F_/C_Compiler/Part5/main.s
+
+# target to generate assembly for a file
+F_/C_Compiler/Part5/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Part5.dir\build.make CMakeFiles/Part5.dir/F_/C_Compiler/Part5/main.cpp.s
+.PHONY : F_/C_Compiler/Part5/main.cpp.s
+
 main.obj: main.cpp.obj
 .PHONY : main.obj
 
@@ -275,6 +312,7 @@ help:
 	@echo ... Part2
 	@echo ... Part3
 	@echo ... Part4
+	@echo ... Part5
 	@echo ... F_/C_Compiler/Part2/main.obj
 	@echo ... F_/C_Compiler/Part2/main.i
 	@echo ... F_/C_Compiler/Part2/main.s
@@ -284,6 +322,9 @@ help:
 	@echo ... F_/C_Compiler/Part4/main.obj
 	@echo ... F_/C_Compiler/Part4/main.i
 	@echo ... F_/C_Compiler/Part4/main.s
+	@echo ... F_/C_Compiler/Part5/main.obj
+	@echo ... F_/C_Compiler/Part5/main.i
+	@echo ... F_/C_Compiler/Part5/main.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
