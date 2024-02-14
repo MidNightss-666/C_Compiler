@@ -230,6 +230,12 @@ namespace mc
         Factor* _next= nullptr;
         bool _isdigit= false;
         Exp* _exp= nullptr;
+
+        ~Factor()
+        {
+            delete _exp;
+            delete _next;
+        }
     };
 
     class Term
@@ -238,6 +244,12 @@ namespace mc
         SyntaxKind _kind;//* /
         Factor* _factor= nullptr;
         Term* _next= nullptr;
+
+        ~Term()
+        {
+            delete _factor;
+            delete _next;
+        }
     };
 
     class AddExp
@@ -246,6 +258,12 @@ namespace mc
         SyntaxKind _kind=SyntaxKind::Unset;//+ -
         Term* _term= nullptr;
         AddExp* _next= nullptr;
+
+        ~AddExp()
+        {
+            delete _term;
+            delete _next;
+        }
     };
 
     class RelationalExp
@@ -254,6 +272,12 @@ namespace mc
         SyntaxKind _kind=SyntaxKind::Unset;//"<" | ">" | "<=" | ">="
         AddExp* _addexp= nullptr;
         RelationalExp* _next= nullptr;
+
+        ~RelationalExp()
+        {
+            delete _addexp;
+            delete _next;
+        }
     };
 
     class EqualityExp
@@ -262,6 +286,12 @@ namespace mc
         SyntaxKind _kind=SyntaxKind::Unset;// == !=
         RelationalExp* _relationalexp= nullptr;
         EqualityExp* _next= nullptr;
+
+        ~EqualityExp()
+        {
+            delete _relationalexp;
+            delete _next;
+        }
     };
 
     class LAndExp
@@ -270,6 +300,12 @@ namespace mc
         SyntaxKind _kind=SyntaxKind::Unset;// &&
         EqualityExp* _equalityexp= nullptr;
         LAndExp* _next= nullptr;
+
+        ~LAndExp()
+        {
+            delete _equalityexp;
+            delete _next;
+        }
     };
 
     class Exp
@@ -278,6 +314,12 @@ namespace mc
         SyntaxKind _kind=SyntaxKind::Unset;// "||"
         LAndExp* _landexp= nullptr;
         Exp* _next= nullptr;
+
+        ~Exp()
+        {
+            delete _landexp;
+            delete _next;
+        }
     };
 
 
@@ -292,6 +334,11 @@ namespace mc
         }
         StatementType _type;
         Exp* _exp= nullptr;
+
+        ~Statement()
+        {
+            delete _exp;
+        }
     };
 
     class Function
@@ -306,6 +353,10 @@ namespace mc
         Statement* _statement= nullptr;
         //函数名称
         string _name;
+        ~Function()
+        {
+            delete _statement;
+        }
     };
 
     class Program
@@ -316,6 +367,12 @@ namespace mc
             _function=function;
         }
         Function* _function= nullptr;
+
+        ~Program()
+        {
+
+            delete _function;
+        }
     };
 
     bool isUnaryOp(SyntaxToken* token)
@@ -716,26 +773,30 @@ namespace mc
         landexp_out(exp->_landexp,fout);
 
         string return_flag=return_counter();
-        while (exp->_next!= nullptr)
+        if (exp->_next!= nullptr)
         {
-            fout<<"    cmpl $0, %eax"<<endl; //cmp e1 and false
+            while (exp->_next!= nullptr)
+            {
+                fout<<"    cmpl $0, %eax"<<endl; //cmp e1 and false
 
-            string clause_flag=clause_counter();
+                string clause_flag=clause_counter();
 
 
-            fout<<"    je "<<clause_flag<<endl; //jump if e1 equals false
-            fout<<"    movl $1, %eax"<<endl; //else set ret true
-            fout<<"    jmp "<<return_flag<<endl;//jump to _end
-            fout<<clause_flag<<":"<<endl;
-            landexp_out(exp->_next->_landexp,fout);//next bool expression
-            exp=exp->_next;
+                fout<<"    je "<<clause_flag<<endl; //jump if e1 equals false
+                fout<<"    movl $1, %eax"<<endl; //else set ret true
+                fout<<"    jmp "<<return_flag<<endl;//jump to _end
+                fout<<clause_flag<<":"<<endl;
+                landexp_out(exp->_next->_landexp,fout);//next bool expression
+                exp=exp->_next;
+            }
+            //last bool expression finished, and don't jump to the end
+
+            fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
+            fout<<"    movl $0, %eax"<<endl;
+            fout<<"    setne %al"<<endl;//set %eax true if not equal to false (of course!)
+            fout<<return_flag<<":"<<endl;
         }
-        //last bool expression finished, and don't jump to the end
 
-        fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
-        fout<<"    movl $0, %eax"<<endl;
-        fout<<"    setne %al"<<endl;//set %eax true if not equal to false (of course!)
-        fout<<return_flag<<":"<<endl;
 
     }
 
@@ -746,24 +807,28 @@ namespace mc
         equalityexp_out(exp->_equalityexp,fout);
 
         string return_flag=return_counter();
-        while (exp->_next!= nullptr)
+        if (exp->_next!= nullptr)
         {
-            fout<<"    cmpl $0, %eax"<<endl;
+            while (exp->_next!= nullptr)
+            {
+                fout<<"    cmpl $0, %eax"<<endl;
 
-            string clause_flag=clause_counter();
+                string clause_flag=clause_counter();
 
-            fout<<"    jne "<<clause_flag<<endl; //jump to the next expression e2 if e1 is true
-            fout<<"    jmp "<<return_flag<<endl;//otherwise jump to the end
-            fout<<clause_flag<<":"<<endl;
-            equalityexp_out(exp->_next->_equalityexp,fout);//next bool expression
-            exp=exp->_next;
+                fout<<"    jne "<<clause_flag<<endl; //jump to the next expression e2 if e1 is true
+                fout<<"    jmp "<<return_flag<<endl;//otherwise jump to the end
+                fout<<clause_flag<<":"<<endl;
+                equalityexp_out(exp->_next->_equalityexp,fout);//next bool expression
+                exp=exp->_next;
+            }
+            //last bool expression finished, and don't jump to the end yet
+
+            fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
+            fout<<"    movl $0, %eax"<<endl;
+            fout<<"    setne %al"<<endl;//set %eax true if not equal to false
+            fout<<return_flag<<":"<<endl;
+
         }
-        //last bool expression finished, and don't jump to the end yet
-
-        fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
-        fout<<"    movl $0, %eax"<<endl;
-        fout<<"    setne %al"<<endl;//set %eax true if not equal to false
-        fout<<return_flag<<":"<<endl;
 
     }
 
@@ -933,7 +998,12 @@ namespace mc
         }
 
     }
+
+
+
 }
+
+
 
 int main(int argc,char* argv[]) {
     int test=0;
@@ -978,7 +1048,7 @@ int main(int argc,char* argv[]) {
     command.append(Filename+".s -o ").append(Filename);
 //        system(command.c_str());
 
-
+    delete program;
     return 0;
 }
 
