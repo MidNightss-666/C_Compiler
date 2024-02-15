@@ -8,6 +8,7 @@
 #include <istream>
 #include <ostream>
 #include <fstream>
+#include <list>
 
 using namespace std;
 
@@ -61,6 +62,8 @@ namespace mc
         GthanToken,
         //>=
         GEthanToken,
+        //=
+        AssignmentToken,
         //unset
         Unset,
         //others
@@ -94,6 +97,11 @@ namespace mc
         {
             _text=text;
             _position=0;
+        }
+
+        void Setposition(int p)
+        {
+            _position=p;
         }
 
         void Next()
@@ -183,6 +191,7 @@ namespace mc
                 if (Current() == '=') {
                     return SyntaxToken(SyntaxKind::EqualToken, (_position++) - 1, "==");
                 }
+                return SyntaxToken(SyntaxKind::AssignmentToken,_position-1,"=");
             }else if (Current() == '<') {
                 Next();
                 if (Current() == '=') {
@@ -212,9 +221,7 @@ namespace mc
         }
     };
 
-    enum StatementType{
-        Return
-    };
+
     class Exp;
 
     class Factor
@@ -230,6 +237,7 @@ namespace mc
         Factor* _next= nullptr;
         bool _isdigit= false;
         Exp* _exp= nullptr;
+        string _id;
 
         ~Factor()
         {
@@ -308,20 +316,37 @@ namespace mc
         }
     };
 
-    class Exp
+    class LOrExp
     {
     public:
         SyntaxKind _kind=SyntaxKind::Unset;// "||"
         LAndExp* _landexp= nullptr;
-        Exp* _next= nullptr;
+        LOrExp* _next= nullptr;
 
-        ~Exp()
+        ~LOrExp()
         {
             delete _landexp;
             delete _next;
         }
     };
 
+    enum ExpKind
+    {
+        AssignmentKind,LorKind,
+    };
+
+    class Exp
+    {
+    public:
+        string _id;
+        Exp* _next= nullptr;
+        ExpKind _kind;
+        LOrExp* _lOrExp= nullptr;
+    };
+
+    enum StatementType{
+        ReturnType,ExpType,DeclareType
+    };
 
     class Statement
     {
@@ -334,6 +359,7 @@ namespace mc
         }
         StatementType _type;
         Exp* _exp= nullptr;
+        string _id;
 
         ~Statement()
         {
@@ -347,16 +373,14 @@ namespace mc
         Function()= default;
         Function(Statement* statement,string name)
         {
-            _statement=statement;
+            _list.push_back(statement);
             _name=name;
         }
-        Statement* _statement= nullptr;
+        list<Statement*>_list;
+
         //函数名称
         string _name;
-        ~Function()
-        {
-            delete _statement;
-        }
+
     };
 
     class Program
@@ -393,8 +417,55 @@ namespace mc
 
         Exp* parse_Exp()
         {
-            //<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+            //<exp> ::= <id> "=" <exp> | <logical-or-exp>
+
+            SyntaxToken p=_lexer->Peek();
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            p=_lexer->Peek();
+
             Exp* exp=new Exp();
+            if(p._kind==SyntaxKind::IdToken)
+            {
+                int position=p._position;
+                string NAME=p._text;
+
+                _lexer->NextToken();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+
+                if (p._kind==SyntaxKind::AssignmentToken)
+                {
+                    Exp* next_exp=parse_Exp();
+
+                    exp->_kind=ExpKind::AssignmentKind;
+                    exp->_next=next_exp;
+                    exp->_id=NAME;
+                }else
+                {
+                    _lexer->Setposition(position-1);
+                    LOrExp* lOrExp = parse_LOrExp();
+
+
+                    exp->_lOrExp=lOrExp;
+
+                }
+            }else
+            {
+                LOrExp* lOrExp = parse_LOrExp();
+
+
+                exp->_lOrExp=lOrExp;
+            }
+
+            return exp;
+        }
+
+        LOrExp* parse_LOrExp()
+        {
+            //<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+            LOrExp* exp=new LOrExp();
             LAndExp* lAndExp=parse_LAndExp();
             exp->_landexp=lAndExp;
             SyntaxToken p= _lexer->Peek();
@@ -403,14 +474,14 @@ namespace mc
                 p=_lexer->NextToken();
             p=_lexer->Peek();
 
-            Exp* exp_iter=exp;
+            LOrExp* exp_iter=exp;
             while(p._kind==SyntaxKind::OrToken)
             {
                 //another logical-and-exp
 
                 _lexer->NextToken();
                 LAndExp* lAndExp1=parse_LAndExp();
-                Exp* exp1=new Exp();
+                LOrExp* exp1=new LOrExp();
                 exp1->_kind=p._kind;
                 exp1->_landexp=lAndExp;
                 exp_iter->_next=exp1;
@@ -620,12 +691,17 @@ namespace mc
                 Factor* factor=new Factor();
                 factor->_exp=exp;
                 return factor;
+            }else if (p._kind==SyntaxKind::IdToken)
+            {
+                Factor* factor=new Factor();
+                factor->_id=p._text;
+                return factor;
             }
             else
             {
                 //test
                 cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
-                cout<<"kind:"<<p._kind<<"text:"<<p._text;
+                cout<<"kind:"<<p._kind<<" "<<"text:"<<p._text<<endl;
 
                 fail("factor error2");
             }
@@ -636,34 +712,94 @@ namespace mc
         //parse the statement
         Statement* parse_statement()
         {
+            //<statement> ::= "return" <exp> ";"
+            //              | <exp> ";"
+            //              | "int" <id> [ = <exp> ] ";"
             SyntaxToken p=_lexer->NextToken();
 
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
 
-            if(p._kind!=SyntaxKind::RetToken) fail("statement error1");
-            p=_lexer->NextToken();
-            if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
-
-            Exp* exp=parse_Exp();
-
-            p=_lexer->NextToken();
-            if(p._kind==SyntaxKind::BlankToken)
+            if(p._kind==SyntaxKind::RetToken)
+            {
                 p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::BlankToken) fail("statement error1");
+                Exp* exp=parse_Exp();
+
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
 //            //test
 //            cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
 //            cout<<"kind:"<<p._kind<<"text:"<<p._text;
 
-            if(p._kind!=SyntaxKind::SemiToken) fail("statement error3");
+                if(p._kind!=SyntaxKind::SemiToken) fail("statement error2");
 
-            Statement* statement=new Statement(StatementType::Return,exp);
-            return statement;
+                Statement* statement=new Statement(StatementType::ReturnType,exp);
+                return statement;
+            }else if (p._kind==SyntaxKind::IntToken)
+            {
+                //<statement> ::= "int" <id> [ = <exp> ] ";"
+                p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::BlankToken) fail("statement error3");
+
+                p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::IdToken) fail("statement error1");
+
+                string ID_NAME=p._text;
+
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::SemiToken)
+                {
+                    Statement* statement=new Statement();
+                    statement->_type=StatementType::DeclareType;
+                    statement->_id=ID_NAME;
+                    return statement;
+                }else if (p._kind==SyntaxKind::AssignmentToken)
+                {
+                    Exp* exp=parse_Exp();
+
+                    p=_lexer->NextToken();
+                    if(p._kind==SyntaxKind::BlankToken)
+                        p=_lexer->NextToken();
+                    if(p._kind!=SyntaxKind::SemiToken) fail("statement error1");
+
+                    Statement* statement=new Statement();
+                    statement->_type=StatementType::DeclareType;
+                    statement->_id=ID_NAME;
+                    statement->_exp=exp;
+                    return statement;
+                }
+
+            }else
+            {
+                Exp* exp=parse_Exp();
+                p=_lexer->NextToken();
+
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+
+                if(p._kind!=SyntaxKind::SemiToken) fail("statement error");
+
+                Statement* statement = new Statement();
+                statement->_exp=exp;
+                statement->_type=StatementType::ExpType;
+
+                return statement;
+
+            }
+
+            return nullptr;
         }
 
         //parse the function
         Function* parse_function()
         {
             //int main() {    return 2;}
+            //<function> ::= "int" <id> "(" ")" "{" { <statement> } "}"
+
             SyntaxToken p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
@@ -697,15 +833,29 @@ namespace mc
 
             Statement* statement=parse_statement();
 
-            p=_lexer->NextToken();
+            p=_lexer->Peek();
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
+            p=_lexer->Peek();
+
+            Function* ret=new Function();
+            ret->_list.push_back(statement);
+            while (p._kind!=SyntaxKind::CBraceToken)
+            {
+                Statement* next_statement=parse_statement();
+                ret->_list.push_back(next_statement);
+
+                p=_lexer->Peek();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            _lexer->NextToken();
+
             if(p._kind!=SyntaxKind::CBraceToken) fail("function error7");
 
-            Function* function=new Function(statement,name);
 
-
-            return function;
+            return ret;
         }
 
         //parse the program
@@ -759,6 +909,7 @@ namespace mc
 //<unary_op> ::= "!" | "~" | "-"
 
     void exp_out(Exp* exp, ofstream &fout);
+    void LOrExp_out(LOrExp* exp, ofstream &fout);
     void landexp_out(LAndExp* exp, ofstream &fout);
     void equalityexp_out(EqualityExp* exp, ofstream &fout);
     void relationalexp_out(RelationalExp* exp, ofstream &fout);
@@ -766,8 +917,15 @@ namespace mc
     void term_out(Term* term,ofstream &fout);
     void factor_out(Factor* factor,ofstream &fout);
 
-//<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+//    <exp> ::= <id> "=" <exp> | <logical-or-exp>
+
     void exp_out(Exp* exp, ofstream &fout)
+    {
+
+    }
+
+//<logical-or-exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+    void LOrExp_out(LOrExp* exp, ofstream &fout)
     {
         if (exp== nullptr) return;
         landexp_out(exp->_landexp,fout);
@@ -974,14 +1132,23 @@ namespace mc
         }
     }
 
+    void statement_out(Statement* statement,ofstream &fout)
+    {
+
+    }
+
     void aOut(Program* program,ofstream &fout)
     {
         string name=program->_function->_name;
         fout<<" .globl"<<" "<<name<<endl;
         fout<<name<<":"<<endl;
-
-        Exp* exp=program->_function->_statement->_exp;
-        exp_out(exp,fout);
+        auto slist=&program->_function->_list;
+        for (auto i = slist->begin(); i != slist->end(); ++i)
+        {
+            statement_out(*i,fout);
+        }
+//        Exp* exp=program->_function->_statement->_exp;
+//        exp_out(exp,fout);
         fout<<"ret";
 
         fout.close();
@@ -989,13 +1156,13 @@ namespace mc
 
     __attribute__((unused)) void pretty_print(Program* program)
     {
-        cout<<"program:"<<program->_function->_name<<endl;
-        Exp* exp=program->_function->_statement->_exp;
-        while(exp!=nullptr)
-        {
-//            exp= exp->_next;
-//            cout << exp->_text<<endl;
-        }
+//        cout<<"program:"<<program->_function->_name<<endl;
+//        Exp* exp=program->_function->_statement->_exp;
+//        while(exp!=nullptr)
+//        {
+////            exp= exp->_next;
+////            cout << exp->_text<<endl;
+//        }
 
     }
 
