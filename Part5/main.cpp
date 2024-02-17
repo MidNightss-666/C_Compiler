@@ -9,12 +9,20 @@
 #include <ostream>
 #include <fstream>
 #include <list>
+#include <map>
+#include <unordered_map>
 
 using namespace std;
 
 
 namespace mc
 {
+    void fail(const char* text)
+    {
+        fprintf(stderr,text);
+        cout<<"\n";
+        exit(EXIT_FAILURE);
+    }
     enum SyntaxKind{
         NumberToken,
         //" "
@@ -221,6 +229,10 @@ namespace mc
         }
     };
 
+    enum FactorKind
+    {
+        ExpFactor,UnaryFactor,NumberFactor,IdFactor
+    };
 
     class Exp;
 
@@ -237,7 +249,8 @@ namespace mc
         Factor* _next= nullptr;
         bool _isdigit= false;
         Exp* _exp= nullptr;
-        string _id;
+
+        FactorKind _kind;
 
         ~Factor()
         {
@@ -447,7 +460,7 @@ namespace mc
                     _lexer->Setposition(position-1);
                     LOrExp* lOrExp = parse_LOrExp();
 
-
+                    exp->_kind=ExpKind::LorKind;
                     exp->_lOrExp=lOrExp;
 
                 }
@@ -455,7 +468,7 @@ namespace mc
             {
                 LOrExp* lOrExp = parse_LOrExp();
 
-
+                exp->_kind=ExpKind::LorKind;
                 exp->_lOrExp=lOrExp;
             }
 
@@ -670,6 +683,7 @@ namespace mc
                 Factor* pFactor=new Factor(p._text);
                 pFactor->_val= stoi(pFactor->_text);
                 pFactor->_isdigit= true;
+                pFactor->_kind=FactorKind::NumberFactor;
                 return pFactor;
             }else if(mc::isUnaryOp(&p))
             {
@@ -678,6 +692,7 @@ namespace mc
                 Factor* pFactor=new Factor(p._text);
                 Factor* inner_exp=parse_factor();
                 pFactor->_next=inner_exp;
+                pFactor->_kind=FactorKind::UnaryFactor;
                 return pFactor;
             }else if (p._kind==SyntaxKind::OpToken)
             {
@@ -690,11 +705,13 @@ namespace mc
                 }
                 Factor* factor=new Factor();
                 factor->_exp=exp;
+                factor->_kind=FactorKind::ExpFactor;
                 return factor;
             }else if (p._kind==SyntaxKind::IdToken)
             {
                 Factor* factor=new Factor();
-                factor->_id=p._text;
+                factor->_text=p._text;
+                factor->_kind=FactorKind::IdFactor;
                 return factor;
             }
             else
@@ -869,12 +886,6 @@ namespace mc
 
     private:
         Lexer* _lexer;
-        static void fail(const char* text)
-        {
-            fprintf(stderr,text);
-            exit(EXIT_FAILURE);
-        }
-
     };
 
     string clause_counter()
@@ -895,264 +906,377 @@ namespace mc
         return ret;
     }
 
+//    <program> ::= <function>
+//    <function> ::= "int" <id> "(" ")" "{" { <statement> } "}"
+//    <statement> ::= "return" <exp> ";"
+//                    | <exp> ";"
+//                    | "int" <id> [ = <exp>] ";"
+//    <exp> ::= <id> "=" <exp> | <logical-or-exp>
+//    <logical-or-exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
+//    <logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
+//    <equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
+//    <relational-exp> ::= <additive-exp> { ("<" | ">" | "<=" | ">=") <additive-exp> }
+//    <additive-exp> ::= <term> { ("+" | "-") <term> }
+//    <term> ::= <factor> { ("*" | "/") <factor> }
+//    <factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int> | <id>
+//    <unary_op> ::= "!" | "~" | "-"
 
-//<program> ::= <function>
-//<function> ::= "int" <id> "(" ")" "{" <statement> "}"
-//<statement> ::= "return" <exp> ";"
-//<exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
-//<logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
-//<equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
-//<relational-exp> ::= <additive-exp> { ("<" | ">" | "<=" | ">=") <additive-exp> }
-//<additive-exp> ::= <term> { ("+" | "-") <term> }
-//<term> ::= <factor> { ("*" | "/") <factor> }
-//<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
-//<unary_op> ::= "!" | "~" | "-"
+    class Varmap
+    {
+    public:
+        bool contains(string s)
+        {
+            return _map.find(s)!=_map.end();
+        }
 
-    void exp_out(Exp* exp, ofstream &fout);
-    void LOrExp_out(LOrExp* exp, ofstream &fout);
-    void landexp_out(LAndExp* exp, ofstream &fout);
-    void equalityexp_out(EqualityExp* exp, ofstream &fout);
-    void relationalexp_out(RelationalExp* exp, ofstream &fout);
-    void addexp_out(AddExp* addExp, ofstream &fout);
-    void term_out(Term* term,ofstream &fout);
-    void factor_out(Factor* factor,ofstream &fout);
+        int find(string s)
+        {
+            if(!contains(s))
+                fail((s+"is not declared").c_str());
+            return _map[s];
+        }
+
+        Varmap* push(string s,int stack_index)
+        {
+            unordered_map<string,int> copy_map(_map);
+            copy_map[s]=stack_index;
+            Varmap* ret=new Varmap();
+            ret->set_map(copy_map);
+
+            return ret;
+        }
+
+
+    private:
+        unordered_map<string,int> _map;
+        void set_map(unordered_map<string,int> map)
+        {
+            _map=map;
+        }
+    };
+
+
+
+
+    class Assembler
+    {
+    public:
+        Assembler(Varmap *varmap, string filename)
+                : _varmap(varmap)
+        {
+            string Filename=filename;
+            int length=Filename.length();
+            Filename=Filename.substr(0,length-2);
+            fout.open(Filename+".s");
+            if (fout.is_open())
+            {
+                fail("fail to create file");
+            }
+        }
+
+        //    <statement> ::= "return" <exp> ";"
+        //                    | <exp> ";"
+        //                    | "int" <id> [ = <exp>] ";"
+        void statement_out(list<Statement*>* slist)
+        {
+            int stack_index=0;
+
+
+            for (auto i = slist->begin(); i != slist->end(); ++i)
+            {
+                Statement* statement=*i;
+                if (statement->_type==StatementType::DeclareType)
+                {
+                    if (_varmap->contains(statement->_id))
+                    {
+                        string text="redeclaration of ";
+                        text+=statement->_id;
+                        fail(text.c_str());
+                    }
+                    fout<<"    movl    $0, %eax"<<endl;
+                    if(statement->_exp != nullptr)
+                    {
+                        exp_out(statement->_exp);
+                    }
+                    fout<<"    pushl %eax"<<endl;
+                    _varmap=_varmap->push(statement->_id,stack_index);
+                    stack_index-=4;
+                }else if (statement->_type==StatementType::ExpType)
+                {
+                    exp_out(statement->_exp);
+
+                }else if (statement->_type==StatementType::ReturnType)
+                {
+                    exp_out(statement->_exp);
+
+                    fout<<"    movl %ebp, %esp"<<endl;
+                    fout<<"    pop %ebp"<<endl;
+                    fout<<"ret"<<endl;
+                }
+
+            }
+
+        }
 
 //    <exp> ::= <id> "=" <exp> | <logical-or-exp>
+        void exp_out(Exp* exp)
+        {
+            if (exp->_kind==ExpKind::AssignmentKind)
+            {
+                exp_out(exp->_next);
 
-    void exp_out(Exp* exp, ofstream &fout)
-    {
-
-    }
+                if(!_varmap->contains(exp->_id))
+                    fail((exp->_id+"is not declared").c_str());
+                int offset=_varmap->find(exp->_id);
+                fout<<"    movl %eax, "<<offset<<"(%ebp)"<<endl;
+            }else if(exp->_kind==ExpKind::LorKind)
+            {
+                LOrExp_out(exp->_lOrExp);
+            }
+        }
 
 //<logical-or-exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
-    void LOrExp_out(LOrExp* exp, ofstream &fout)
-    {
-        if (exp== nullptr) return;
-        landexp_out(exp->_landexp,fout);
-
-        string return_flag=return_counter();
-        if (exp->_next!= nullptr)
+        void LOrExp_out(LOrExp* exp)
         {
-            while (exp->_next!= nullptr)
+            if (exp== nullptr) return;
+            landexp_out(exp->_landexp);
+
+            string return_flag=return_counter();
+            if (exp->_next!= nullptr)
             {
-                fout<<"    cmpl $0, %eax"<<endl; //cmp e1 and false
+                while (exp->_next!= nullptr)
+                {
+                    fout<<"    cmpl $0, %eax"<<endl; //cmp e1 and false
 
-                string clause_flag=clause_counter();
+                    string clause_flag=clause_counter();
 
 
-                fout<<"    je "<<clause_flag<<endl; //jump if e1 equals false
-                fout<<"    movl $1, %eax"<<endl; //else set ret true
-                fout<<"    jmp "<<return_flag<<endl;//jump to _end
-                fout<<clause_flag<<":"<<endl;
-                landexp_out(exp->_next->_landexp,fout);//next bool expression
-                exp=exp->_next;
+                    fout<<"    je "<<clause_flag<<endl; //jump if e1 equals false
+                    fout<<"    movl $1, %eax"<<endl; //else set ret true
+                    fout<<"    jmp "<<return_flag<<endl;//jump to _end
+                    fout<<clause_flag<<":"<<endl;
+                    landexp_out(exp->_next->_landexp);//next bool expression
+                    exp=exp->_next;
+                }
+                //last bool expression finished, and don't jump to the end
+
+                fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
+                fout<<"    movl $0, %eax"<<endl;
+                fout<<"    setne %al"<<endl;//set %eax true if not equal to false (of course!)
+                fout<<return_flag<<":"<<endl;
             }
-            //last bool expression finished, and don't jump to the end
 
-            fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
-            fout<<"    movl $0, %eax"<<endl;
-            fout<<"    setne %al"<<endl;//set %eax true if not equal to false (of course!)
-            fout<<return_flag<<":"<<endl;
+
         }
-
-
-    }
 
 //<logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
-    void landexp_out(LAndExp* exp, ofstream &fout)
-    {
-        if (exp== nullptr) return;
-        equalityexp_out(exp->_equalityexp,fout);
-
-        string return_flag=return_counter();
-        if (exp->_next!= nullptr)
+        void landexp_out(LAndExp* exp)
         {
-            while (exp->_next!= nullptr)
+            if (exp== nullptr) return;
+            equalityexp_out(exp->_equalityexp);
+
+            string return_flag=return_counter();
+            if (exp->_next!= nullptr)
             {
-                fout<<"    cmpl $0, %eax"<<endl;
+                while (exp->_next!= nullptr)
+                {
+                    fout<<"    cmpl $0, %eax"<<endl;
 
-                string clause_flag=clause_counter();
+                    string clause_flag=clause_counter();
 
-                fout<<"    jne "<<clause_flag<<endl; //jump to the next expression e2 if e1 is true
-                fout<<"    jmp "<<return_flag<<endl;//otherwise jump to the end
-                fout<<clause_flag<<":"<<endl;
-                equalityexp_out(exp->_next->_equalityexp,fout);//next bool expression
-                exp=exp->_next;
+                    fout<<"    jne "<<clause_flag<<endl; //jump to the next expression e2 if e1 is true
+                    fout<<"    jmp "<<return_flag<<endl;//otherwise jump to the end
+                    fout<<clause_flag<<":"<<endl;
+                    equalityexp_out(exp->_next->_equalityexp);//next bool expression
+                    exp=exp->_next;
+                }
+                //last bool expression finished, and don't jump to the end yet
+
+                fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
+                fout<<"    movl $0, %eax"<<endl;
+                fout<<"    setne %al"<<endl;//set %eax true if not equal to false
+                fout<<return_flag<<":"<<endl;
+
             }
-            //last bool expression finished, and don't jump to the end yet
-
-            fout<<"    cmpl $0, %eax"<<endl;//test the ans of the last bool expression
-            fout<<"    movl $0, %eax"<<endl;
-            fout<<"    setne %al"<<endl;//set %eax true if not equal to false
-            fout<<return_flag<<":"<<endl;
 
         }
-
-    }
 
 //<equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
-    void equalityexp_out(EqualityExp* exp, ofstream &fout)
-    {
-        if (exp== nullptr) return;
-        relationalexp_out(exp->_relationalexp,fout);
-        while(exp->_next!= nullptr)
+        void equalityexp_out(EqualityExp* exp)
         {
-            fout<<"    push %eax"<<endl;
-            relationalexp_out(exp->_next->_relationalexp,fout);
-            fout<<"    pop %ecx"<<endl;
-            if(exp->_next->_kind==SyntaxKind::EqualToken)
+            if (exp== nullptr) return;
+            relationalexp_out(exp->_relationalexp);
+            while(exp->_next!= nullptr)
             {
-                fout<<"     cmpl   %eax, %ecx"<<endl;
-                fout<<"     movl   $0, %eax"<<endl;
-                fout<<"     sete   %al"<<endl;
-            }else if (exp->_next->_kind==SyntaxKind::NequalToken)
-            {
-                fout<<"     cmpl   %eax, %ecx"<<endl;
-                fout<<"     movl   $0, %eax"<<endl;
-                fout<<"     setne   %al"<<endl;
+                fout<<"    push %eax"<<endl;
+                relationalexp_out(exp->_next->_relationalexp);
+                fout<<"    pop %ecx"<<endl;
+                if(exp->_next->_kind==SyntaxKind::EqualToken)
+                {
+                    fout<<"     cmpl   %eax, %ecx"<<endl;
+                    fout<<"     movl   $0, %eax"<<endl;
+                    fout<<"     sete   %al"<<endl;
+                }else if (exp->_next->_kind==SyntaxKind::NequalToken)
+                {
+                    fout<<"     cmpl   %eax, %ecx"<<endl;
+                    fout<<"     movl   $0, %eax"<<endl;
+                    fout<<"     setne   %al"<<endl;
+                }
+
+                exp=exp->_next;
             }
 
-            exp=exp->_next;
         }
-
-    }
 
 //<relational-exp> ::= <additive-exp> { ("<" | ">" | "<=" | ">=") <additive-exp> }
-    void relationalexp_out(RelationalExp* exp, ofstream &fout)
-    {
-        if (exp== nullptr) return;
-        addexp_out(exp->_addexp,fout);
-        while(exp->_next!= nullptr)
+        void relationalexp_out(RelationalExp* exp)
         {
-            fout<<"    push %eax"<<endl;
-            addexp_out(exp->_next->_addexp,fout);
-            fout<<"    pop %ecx"<<endl;
-            if(exp->_next->_kind==SyntaxKind::LthanToken)
+            if (exp== nullptr) return;
+            addexp_out(exp->_addexp);
+            while(exp->_next!= nullptr)
             {
-                //"<"
-                fout<<"     cmpl   %eax, %ecx"<<endl;
-                fout<<"     movl   $0, %eax"<<endl;
-                fout<<"     setl   %al"<<endl;
-            }else if (exp->_next->_kind==SyntaxKind::LEthanToken)
-            {
-                //"<="
-                fout<<"     cmpl   %eax, %ecx"<<endl;
-                fout<<"     movl   $0, %eax"<<endl;
-                fout<<"     setle   %al"<<endl;
-            }else if (exp->_next->_kind==SyntaxKind::GthanToken)
-            {
-                //">"
-                fout<<"     cmpl   %eax, %ecx"<<endl;
-                fout<<"     movl   $0, %eax"<<endl;
-                fout<<"     setg   %al"<<endl;
-            }else if (exp->_next->_kind==SyntaxKind::GEthanToken)
-            {
-                //">="
-                fout<<"     cmpl   %eax, %ecx"<<endl;
-                fout<<"     movl   $0, %eax"<<endl;
-                fout<<"     setge   %al"<<endl;
+                fout<<"    push %eax"<<endl;
+                addexp_out(exp->_next->_addexp);
+                fout<<"    pop %ecx"<<endl;
+                if(exp->_next->_kind==SyntaxKind::LthanToken)
+                {
+                    //"<"
+                    fout<<"     cmpl   %eax, %ecx"<<endl;
+                    fout<<"     movl   $0, %eax"<<endl;
+                    fout<<"     setl   %al"<<endl;
+                }else if (exp->_next->_kind==SyntaxKind::LEthanToken)
+                {
+                    //"<="
+                    fout<<"     cmpl   %eax, %ecx"<<endl;
+                    fout<<"     movl   $0, %eax"<<endl;
+                    fout<<"     setle   %al"<<endl;
+                }else if (exp->_next->_kind==SyntaxKind::GthanToken)
+                {
+                    //">"
+                    fout<<"     cmpl   %eax, %ecx"<<endl;
+                    fout<<"     movl   $0, %eax"<<endl;
+                    fout<<"     setg   %al"<<endl;
+                }else if (exp->_next->_kind==SyntaxKind::GEthanToken)
+                {
+                    //">="
+                    fout<<"     cmpl   %eax, %ecx"<<endl;
+                    fout<<"     movl   $0, %eax"<<endl;
+                    fout<<"     setge   %al"<<endl;
+                }
+
+                exp=exp->_next;
             }
 
-            exp=exp->_next;
         }
 
-    }
-
-//<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int>
-    void factor_out(Factor* factor,ofstream &fout)
-    {
-        if(factor== nullptr) return;
-        //<factor> ::= "(" <exp> ")"
-        if(factor->_exp!= nullptr)
-            exp_out(factor->_exp,fout);
-        else if(factor->_next!= nullptr)
-            factor_out(factor->_next,fout);
-        //<factor> ::=  <unary_op> <factor>
-        if(factor->_text=="-")
-            fout<<"neg     %eax"<<endl;
-        else if(factor->_text=="~")
-            fout<<"not     %eax"<<endl;
-        else if(factor->_text=="!")
+//<factor> ::= "(" <exp> ")" | <unary_op> <factor> | <int> | <id>
+        void factor_out(Factor* factor)
         {
-            fout<<"cmpl    $0, %eax"<<endl;
-            fout<<"movl    $0, %eax"<<endl;
-            fout<<"sete    %al"<<endl;
+            if(factor== nullptr) return;
+            //<factor> ::= "(" <exp> ")"
+            if(factor->_kind==FactorKind::ExpFactor)
+                exp_out(factor->_exp);
+            else if(factor->_kind==FactorKind::UnaryFactor)
+                factor_out(factor->_next);
+            //<factor> ::=  <unary_op> <factor>
+            if(factor->_text=="-")
+                fout<<"neg     %eax"<<endl;
+            else if(factor->_text=="~")
+                fout<<"not     %eax"<<endl;
+            else if(factor->_text=="!")
+            {
+                fout<<"cmpl    $0, %eax"<<endl;
+                fout<<"movl    $0, %eax"<<endl;
+                fout<<"sete    %al"<<endl;
+            }
+                //<factor> ::= <int>
+            else if(factor->_kind==FactorKind::NumberFactor)
+                fout<<" movl    $"<<factor->_text<<","<<" %eax"<<endl;
+            else if (factor->_kind==FactorKind::IdFactor)
+            {
+                int offset=_varmap->find(factor->_text);
+                fout<<"    movl "<<offset<<"(%ebp), %eax"<<endl;
+            }
         }
-            //<factor> ::= <int>
-        else if(factor->_isdigit)
-            fout<<" movl    $"<<factor->_text<<","<<" %eax"<<endl;
-        //
-    }
 
 //    <term> ::= <factor> { ("*" | "/") <factor> }
-    void term_out(Term* term,ofstream &fout)
-    {
-        if(term== nullptr) return;
-        factor_out(term->_factor,fout);
-
-        while (term->_next!= nullptr)
+        void term_out(Term* term)
         {
-            fout<<"    push %eax"<<endl;
-            factor_out(term->_next->_factor,fout);
-            fout<<"    pop %ecx"<<endl;
-            if(term->_next->_kind==SyntaxKind::MultiToken)
-                fout<<"    imul %ecx, %eax"<<endl;
-            else if(term->_next->_kind==SyntaxKind::DivToken)
+            if(term== nullptr) return;
+            factor_out(term->_factor);
+
+            while (term->_next!= nullptr)
             {
-                fout<<"    movl %ecx, %edx"<<endl;
-                fout<<"    movl %eax, %ecx"<<endl;
-                fout<<"    movl %edx, %eax"<<endl;
-                fout<<"    cdq"<<endl;
-                fout<<"    idivl %ecx"<<endl;
+                fout<<"    push %eax"<<endl;
+                factor_out(term->_next->_factor);
+                fout<<"    pop %ecx"<<endl;
+                if(term->_next->_kind==SyntaxKind::MultiToken)
+                    fout<<"    imul %ecx, %eax"<<endl;
+                else if(term->_next->_kind==SyntaxKind::DivToken)
+                {
+                    fout<<"    movl %ecx, %edx"<<endl;
+                    fout<<"    movl %eax, %ecx"<<endl;
+                    fout<<"    movl %edx, %eax"<<endl;
+                    fout<<"    cdq"<<endl;
+                    fout<<"    idivl %ecx"<<endl;
+                }
+                term=term->_next;
             }
-            term=term->_next;
+
         }
 
-    }
 //    <additive-exp> ::= <term> { ("+" | "-") <term> }
-    void addexp_out(AddExp* addExp, ofstream &fout)
-    {
-        if(addExp== nullptr) return;
-        term_out(addExp->_term,fout);
-
-        while (addExp->_next!= nullptr)
+        void addexp_out(AddExp* addExp)
         {
-            fout<<"    push %eax"<<endl;
-            term_out(addExp->_next->_term,fout);
-            fout<<"    pop %ecx"<<endl;
-            if(addExp->_next->_kind==SyntaxKind::AddToken)
-                fout<<"    addl %ecx, %eax"<<endl;
-            else if(addExp->_next->_kind==SyntaxKind::NegaToken)
+            if(addExp== nullptr) return;
+            term_out(addExp->_term);
+
+            while (addExp->_next!= nullptr)
             {
-                fout<<"subl %ecx, %eax"<<endl;
-                fout<<"neg     %eax"<<endl;
+                fout<<"    push %eax"<<endl;
+                term_out(addExp->_next->_term);
+                fout<<"    pop %ecx"<<endl;
+                if(addExp->_next->_kind==SyntaxKind::AddToken)
+                    fout<<"    addl %ecx, %eax"<<endl;
+                else if(addExp->_next->_kind==SyntaxKind::NegaToken)
+                {
+                    fout<<"subl %ecx, %eax"<<endl;
+                    fout<<"neg     %eax"<<endl;
+                }
+                addExp=addExp->_next;
+
             }
-            addExp=addExp->_next;
-
         }
-    }
 
-    void statement_out(Statement* statement,ofstream &fout)
-    {
 
-    }
-
-    void aOut(Program* program,ofstream &fout)
-    {
-        string name=program->_function->_name;
-        fout<<" .globl"<<" "<<name<<endl;
-        fout<<name<<":"<<endl;
-        auto slist=&program->_function->_list;
-        for (auto i = slist->begin(); i != slist->end(); ++i)
+        void aOut(Program* program)
         {
-            statement_out(*i,fout);
-        }
+            string name=program->_function->_name;
+            fout<<" .globl"<<" "<<name<<endl;
+            fout<<name<<":"<<endl;
+            fout<<"    push %ebp"<<endl;
+            fout<<"    movl %esp, %ebp"<<endl;
+            auto slist=&program->_function->_list;
+//        for (auto i = slist->begin(); i != slist->end(); ++i)
+//        {
+//
+//        }
+            statement_out(slist);
 //        Exp* exp=program->_function->_statement->_exp;
 //        exp_out(exp,fout);
-        fout<<"ret";
 
-        fout.close();
-    }
+
+            fout.close();
+        }
+
+    private:
+        Varmap* _varmap;
+        ofstream fout;
+    };
+
+
+
+
 
     __attribute__((unused)) void pretty_print(Program* program)
     {
@@ -1204,15 +1328,18 @@ int main(int argc,char* argv[]) {
     mc::Program* program=parser->parse_program();
 
     //set the file name
-    string Filename=filename;
-    int length=Filename.length();
-    Filename=Filename.substr(0,length-2);
-    ofstream fout(Filename+".s");
+//    string Filename=filename;
+//    int length=Filename.length();
+//    Filename=Filename.substr(0,length-2);
 
-    mc::aOut(program,fout);
-    string command="gcc ";
+    mc::Varmap* varmap=new mc::Varmap();
+    mc::Assembler* assembler=new mc::Assembler(varmap,filename);
 
-    command.append(Filename+".s -o ").append(Filename);
+    assembler->aOut(program);
+
+//    string command="gcc ";
+//
+//    command.append(Filename+".s -o ").append(Filename);
 //        system(command.c_str());
 
     delete program;
