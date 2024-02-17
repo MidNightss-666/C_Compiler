@@ -4,9 +4,7 @@
 
 #include <iostream>
 #include <string>
-#include <cstring>
 #include <istream>
-#include <ostream>
 #include <fstream>
 #include <list>
 #include <map>
@@ -252,11 +250,11 @@ namespace mc
 
         FactorKind _kind;
 
-        ~Factor()
-        {
-            delete _exp;
-            delete _next;
-        }
+//        ~Factor()
+//        {
+//            delete _exp;
+//            delete _next;
+//        }
     };
 
     class Term
@@ -266,11 +264,11 @@ namespace mc
         Factor* _factor= nullptr;
         Term* _next= nullptr;
 
-        ~Term()
-        {
-            delete _factor;
-            delete _next;
-        }
+//        ~Term()
+//        {
+//            delete _factor;
+//            delete _next;
+//        }
     };
 
     class AddExp
@@ -280,11 +278,11 @@ namespace mc
         Term* _term= nullptr;
         AddExp* _next= nullptr;
 
-        ~AddExp()
-        {
-            delete _term;
-            delete _next;
-        }
+//        ~AddExp()
+//        {
+//            delete _term;
+//            delete _next;
+//        }
     };
 
     class RelationalExp
@@ -294,11 +292,11 @@ namespace mc
         AddExp* _addexp= nullptr;
         RelationalExp* _next= nullptr;
 
-        ~RelationalExp()
-        {
-            delete _addexp;
-            delete _next;
-        }
+//        ~RelationalExp()
+//        {
+//            delete _addexp;
+//            delete _next;
+//        }
     };
 
     class EqualityExp
@@ -308,11 +306,11 @@ namespace mc
         RelationalExp* _relationalexp= nullptr;
         EqualityExp* _next= nullptr;
 
-        ~EqualityExp()
-        {
-            delete _relationalexp;
-            delete _next;
-        }
+//        ~EqualityExp()
+//        {
+//            delete _relationalexp;
+//            delete _next;
+//        }
     };
 
     class LAndExp
@@ -322,11 +320,11 @@ namespace mc
         EqualityExp* _equalityexp= nullptr;
         LAndExp* _next= nullptr;
 
-        ~LAndExp()
-        {
-            delete _equalityexp;
-            delete _next;
-        }
+//        ~LAndExp()
+//        {
+//            delete _equalityexp;
+//            delete _next;
+//        }
     };
 
     class LOrExp
@@ -336,11 +334,11 @@ namespace mc
         LAndExp* _landexp= nullptr;
         LOrExp* _next= nullptr;
 
-        ~LOrExp()
-        {
-            delete _landexp;
-            delete _next;
-        }
+//        ~LOrExp()
+//        {
+//            delete _landexp;
+//            delete _next;
+//        }
     };
 
     enum ExpKind
@@ -374,10 +372,10 @@ namespace mc
         Exp* _exp= nullptr;
         string _id;
 
-        ~Statement()
-        {
-            delete _exp;
-        }
+//        ~Statement()
+//        {
+//            delete _exp;
+//        }
     };
 
     class Function
@@ -405,11 +403,11 @@ namespace mc
         }
         Function* _function= nullptr;
 
-        ~Program()
-        {
-
-            delete _function;
-        }
+//        ~Program()
+//        {
+//
+//            delete _function;
+//        }
     };
 
     bool isUnaryOp(SyntaxToken* token)
@@ -434,8 +432,11 @@ namespace mc
 
             SyntaxToken p=_lexer->Peek();
             if(p._kind==SyntaxKind::BlankToken)
-                p=_lexer->NextToken();
-            p=_lexer->Peek();
+            {
+                _lexer->NextToken();
+                p=_lexer->Peek();
+            }
+
 
             Exp* exp=new Exp();
             if(p._kind==SyntaxKind::IdToken)
@@ -450,15 +451,21 @@ namespace mc
 
                 if (p._kind==SyntaxKind::AssignmentToken)
                 {
+                    cout<<"   1   "<<endl;
                     Exp* next_exp=parse_Exp();
 
                     exp->_kind=ExpKind::AssignmentKind;
                     exp->_next=next_exp;
                     exp->_id=NAME;
+                    //test
+                    cout<<"   2   "<<endl;
                 }else
                 {
+                    cout<<"   3   "<<endl;
                     _lexer->Setposition(position-1);
                     LOrExp* lOrExp = parse_LOrExp();
+
+                    cout<<"   4   "<<endl;
 
                     exp->_kind=ExpKind::LorKind;
                     exp->_lOrExp=lOrExp;
@@ -466,6 +473,9 @@ namespace mc
                 }
             }else
             {
+                //test
+                cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
+                cout<<"kind:"<<p._kind<<" "<<"text:"<<p._text<<endl;
                 LOrExp* lOrExp = parse_LOrExp();
 
                 exp->_kind=ExpKind::LorKind;
@@ -709,6 +719,7 @@ namespace mc
                 return factor;
             }else if (p._kind==SyntaxKind::IdToken)
             {
+                //<factor> ::= <id>
                 Factor* factor=new Factor();
                 factor->_text=p._text;
                 factor->_kind=FactorKind::IdFactor;
@@ -732,13 +743,18 @@ namespace mc
             //<statement> ::= "return" <exp> ";"
             //              | <exp> ";"
             //              | "int" <id> [ = <exp> ] ";"
-            SyntaxToken p=_lexer->NextToken();
+            SyntaxToken p=_lexer->Peek();
 
             if(p._kind==SyntaxKind::BlankToken)
-                p=_lexer->NextToken();
+            {
+                _lexer->NextToken();
+                p=_lexer->Peek();
+            }
+
 
             if(p._kind==SyntaxKind::RetToken)
             {
+                _lexer->NextToken();
                 p=_lexer->NextToken();
                 if(p._kind!=SyntaxKind::BlankToken) fail("statement error1");
                 Exp* exp=parse_Exp();
@@ -757,6 +773,8 @@ namespace mc
             }else if (p._kind==SyntaxKind::IntToken)
             {
                 //<statement> ::= "int" <id> [ = <exp> ] ";"
+
+                _lexer->NextToken();
                 p=_lexer->NextToken();
                 if(p._kind!=SyntaxKind::BlankToken) fail("statement error3");
 
@@ -792,6 +810,7 @@ namespace mc
 
             }else
             {
+
                 Exp* exp=parse_Exp();
                 p=_lexer->NextToken();
 
@@ -848,30 +867,40 @@ namespace mc
             if(p._kind!=SyntaxKind::OBraceToken) fail("function error6");
 
 
-            Statement* statement=parse_statement();
-
+//            Statement* statement=parse_statement();
+//
             p=_lexer->Peek();
             if(p._kind==SyntaxKind::BlankToken)
+            {
                 p=_lexer->NextToken();
-            p=_lexer->Peek();
+                p=_lexer->Peek();
+            }
+
 
             Function* ret=new Function();
-            ret->_list.push_back(statement);
+//            ret->_list.push_back(statement);
+
+
             while (p._kind!=SyntaxKind::CBraceToken)
             {
                 Statement* next_statement=parse_statement();
+
                 ret->_list.push_back(next_statement);
 
                 p=_lexer->Peek();
                 if(p._kind==SyntaxKind::BlankToken)
+                {
                     p=_lexer->NextToken();
-                p=_lexer->Peek();
+                    p=_lexer->Peek();
+                }
+
             }
+
             _lexer->NextToken();
 
             if(p._kind!=SyntaxKind::CBraceToken) fail("function error7");
 
-
+            ret->_name=name;
             return ret;
         }
 
@@ -968,7 +997,7 @@ namespace mc
             int length=Filename.length();
             Filename=Filename.substr(0,length-2);
             fout.open(Filename+".s");
-            if (fout.is_open())
+            if (!fout.is_open())
             {
                 fail("fail to create file");
             }
@@ -979,7 +1008,8 @@ namespace mc
         //                    | "int" <id> [ = <exp>] ";"
         void statement_out(list<Statement*>* slist)
         {
-            int stack_index=0;
+            int stack_index=-4;
+            int cnt=0;
 
 
             for (auto i = slist->begin(); i != slist->end(); ++i)
@@ -1007,6 +1037,7 @@ namespace mc
 
                 }else if (statement->_type==StatementType::ReturnType)
                 {
+                    cnt++;
                     exp_out(statement->_exp);
 
                     fout<<"    movl %ebp, %esp"<<endl;
@@ -1014,6 +1045,13 @@ namespace mc
                     fout<<"ret"<<endl;
                 }
 
+            }
+            if(!cnt)
+            {
+                fout<<"    movl    $0, %eax"<<endl;
+                fout<<"    movl %ebp, %esp"<<endl;
+                fout<<"    pop %ebp"<<endl;
+                fout<<"ret"<<endl;
             }
 
         }
@@ -1026,7 +1064,7 @@ namespace mc
                 exp_out(exp->_next);
 
                 if(!_varmap->contains(exp->_id))
-                    fail((exp->_id+"is not declared").c_str());
+                    fail((exp->_id+" is not declared").c_str());
                 int offset=_varmap->find(exp->_id);
                 fout<<"    movl %eax, "<<offset<<"(%ebp)"<<endl;
             }else if(exp->_kind==ExpKind::LorKind)
@@ -1297,7 +1335,6 @@ namespace mc
 
 
 int main(int argc,char* argv[]) {
-    int test=0;
     if(argc<2)
     {
         cout<<"invalid usage"<<endl;
@@ -1342,7 +1379,7 @@ int main(int argc,char* argv[]) {
 //    command.append(Filename+".s -o ").append(Filename);
 //        system(command.c_str());
 
-    delete program;
+
     return 0;
 }
 
