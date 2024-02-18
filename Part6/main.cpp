@@ -374,16 +374,16 @@ namespace mc
     class ConditionExp
     {
     public:
-        LOrExp* _lorExp;
-        Exp* _exp;
-        ConditionExp* _next;
+        LOrExp* _lorExp= nullptr;
+        Exp* _exp= nullptr;
+        ConditionExp* _next= nullptr;
     };
 
     class Declaration
     {
     public:
         string _id;
-        Exp* exp= nullptr;
+        Exp* _exp= nullptr;
     };
 
     enum StatementType{
@@ -929,7 +929,7 @@ namespace mc
             //exist assignment
             if(p._kind==SyntaxKind::AssignmentToken)
             {
-                ret->exp=parse_Exp();
+                ret->_exp=parse_Exp();
                 p=_lexer->NextToken();
                 if(p._kind==SyntaxKind::BlankToken)
                     p=_lexer->NextToken();
@@ -1075,7 +1075,10 @@ namespace mc
 //    <statement> ::= "return" <exp> ";"
 //                    | <exp> ";"
 //                    | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
-//    <exp> ::= <id> "=" <exp> | <logical-or-exp>
+//
+//
+//    <exp> ::= <id> "=" <exp> | <conditional-exp>
+//    <conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
 //    <logical-or-exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
 //    <logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
 //    <equality-exp> ::= <relational-exp> { ("!=" | "==") <relational-exp> }
@@ -1138,48 +1141,25 @@ namespace mc
             }
         }
 
-        //    <statement> ::= "return" <exp> ";"
-        //                    | <exp> ";"
-        //                    | "int" <id> [ = <exp>] ";"
-        void statement_out(list<Statement*>* slist)
+        //    <function> ::= "int" <id> "(" ")" "{" { <block-item> } "}"
+        void function_out(Function* function)
         {
-            int stack_index=-4;
+            string name=function->_name;
+            fout<<" .globl"<<" "<<name<<endl;
+            fout<<name<<":"<<endl;
+            fout<<"    push %ebp"<<endl;
+            fout<<"    movl %esp, %ebp"<<endl;
+            auto slist=&function->_list;
+
             int cnt=0;
-
-
-            for (auto i = slist->begin(); i != slist->end(); ++i)
+            for(auto x : *slist)
             {
-                Statement* statement=*i;
-                if (statement->_type==StatementType::DeclareType)
-                {
-                    if (_varmap->contains(statement->_id))
-                    {
-                        string text="redeclaration of ";
-                        text+=statement->_id;
-                        fail(text.c_str());
-                    }
-                    fout<<"    movl    $0, %eax"<<endl;
-                    if(statement->_exp != nullptr)
-                    {
-                        exp_out(statement->_exp);
-                    }
-                    fout<<"    pushl %eax"<<endl;
-                    _varmap=_varmap->push(statement->_id,stack_index);
-                    stack_index-=4;
-                }else if (statement->_type==StatementType::ExpType)
-                {
-                    exp_out(statement->_exp);
-
-                }else if (statement->_type==StatementType::ReturnType)
+                if(x->_type==BlockType::StatementBlock
+                    &&x->_statement->_type==StatementType::ReturnType)
                 {
                     cnt++;
-                    exp_out(statement->_exp);
-
-                    fout<<"    movl %ebp, %esp"<<endl;
-                    fout<<"    pop %ebp"<<endl;
-                    fout<<"ret"<<endl;
                 }
-
+                blockItem_out(x);
             }
             if(!cnt)
             {
@@ -1188,13 +1168,82 @@ namespace mc
                 fout<<"    pop %ebp"<<endl;
                 fout<<"ret"<<endl;
             }
-
         }
 
-//    <exp> ::= <id> "=" <exp> | <logical-or-exp>
+//        <statement> ::= "return" <exp> ";"
+//                        | <exp> ";"
+//                        | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
+        void statement_out(Statement* statement)
+        {
+
+
+            if (statement->_type==StatementType::ConditionType)
+            {
+                exp_out(statement->_exp);
+                string flag1=clause_counter();
+                fout<<"    cmpl $0, %eax"<<endl;
+                fout<<"    je "<<flag1<<endl;
+                statement_out(statement->_statement1);
+                if(statement->_statement2!= nullptr)
+                {
+                    string flag2=clause_counter();
+                    fout<<"    jmp  "<<flag2<<endl;
+                    fout<<flag1<<":"<<endl;
+                    statement_out(statement->_statement2);
+                    fout<<flag2<<":"<<endl;
+
+                }else
+                    fout<<flag1<<":"<<endl;
+
+            }else if (statement->_type==StatementType::ExpType)
+            {
+                exp_out(statement->_exp);
+
+            }else if (statement->_type==StatementType::ReturnType)
+            {
+                exp_out(statement->_exp);
+
+                fout<<"    movl %ebp, %esp"<<endl;
+                fout<<"    pop %ebp"<<endl;
+                fout<<"ret"<<endl;
+            }
+        }
+
+        //<block-item> ::= <statement> | <declaration>
+        void blockItem_out(BlockItem* blockItem)
+        {
+            if(blockItem->_type==BlockType::StatementBlock)
+            {
+                statement_out(blockItem->_statement);
+            }else if (blockItem->_type==BlockType::DeclarationBlock)
+            {
+                declaration_out(blockItem->_declaration);
+            }
+        }
+
+        //<declaration> ::= "int" <id> [ = <exp> ] ";"
+        void declaration_out(Declaration* declaration)
+        {
+            stack_index-=4;
+            if (_varmap->contains(declaration->_id))
+            {
+                string text="redeclaration of ";
+                text+=declaration->_id;
+                fail(text.c_str());
+            }
+            fout<<"    movl    $0, %eax"<<endl;
+            if(declaration->_exp != nullptr)
+            {
+                exp_out(declaration->_exp);
+            }
+            fout<<"    pushl %eax"<<endl;
+            _varmap=_varmap->push(declaration->_id,stack_index);
+        }
+
+//    <exp> ::= <id> "=" <exp> | <conditional-exp>
         void exp_out(Exp* exp)
         {
-            if (exp->_kind==ExpKind::AssignmentKind)
+            if (exp->_kind==ExpKind::AssignmentExp)
             {
                 exp_out(exp->_next);
 
@@ -1202,9 +1251,27 @@ namespace mc
                     fail((exp->_id+" is not declared").c_str());
                 int offset=_varmap->find(exp->_id);
                 fout<<"    movl %eax, "<<offset<<"(%ebp)"<<endl;
-            }else if(exp->_kind==ExpKind::LorKind)
+            }else if(exp->_kind==ExpKind::ConditonalExp)
             {
-                LOrExp_out(exp->_lOrExp);
+                conditionalExp_out(exp->_conditionExp);
+            }
+        }
+//        <conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
+        void conditionalExp_out(ConditionExp* exp)
+        {
+            LOrExp_out(exp->_lorExp);
+            if (exp->_exp!= nullptr)
+            {
+                string flag1=clause_counter();
+                string flag2=clause_counter();
+
+                fout<<"    cmpl $0, %eax"<<endl;
+                fout<<"    je "<<flag1<<endl;
+                exp_out(exp->_exp);
+                fout<<"    jmp  "<<flag2<<endl;
+                fout<<flag1<<":"<<endl;
+                conditionalExp_out(exp->_next);
+                fout<<flag2<<":"<<endl;
             }
         }
 
@@ -1424,19 +1491,9 @@ namespace mc
 
         void aOut(Program* program)
         {
-            string name=program->_function->_name;
-            fout<<" .globl"<<" "<<name<<endl;
-            fout<<name<<":"<<endl;
-            fout<<"    push %ebp"<<endl;
-            fout<<"    movl %esp, %ebp"<<endl;
-            auto slist=&program->_function->_list;
-//        for (auto i = slist->begin(); i != slist->end(); ++i)
-//        {
-//
-//        }
-            statement_out(slist);
-//        Exp* exp=program->_function->_statement->_exp;
-//        exp_out(exp,fout);
+            if (program== nullptr) return;
+
+            function_out(program->_function);
 
 
             fout.close();
@@ -1445,6 +1502,7 @@ namespace mc
     private:
         Varmap* _varmap;
         ofstream fout;
+        int stack_index=0;
     };
 
 
