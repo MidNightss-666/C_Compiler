@@ -70,6 +70,14 @@ namespace mc
         GEthanToken,
         //=
         AssignmentToken,
+        //if
+        IfToken,
+        //else
+        ElseToken,
+        //:
+        ColonToken,
+        //?
+        QToken,
         //unset
         Unset,
         //others
@@ -163,6 +171,10 @@ namespace mc
                     return SyntaxToken(SyntaxKind::IntToken,start,text);
                 if(text=="return")
                     return SyntaxToken(SyntaxKind::RetToken,start,text);
+                if(text=="if")
+                    return SyntaxToken(SyntaxKind::IfToken,start,text);
+                if(text=="else")
+                    return SyntaxToken(SyntaxKind::ElseToken,start,text);
                 else return SyntaxToken(SyntaxKind::IdToken,start,text);
             }
             if(Current()=='{') return SyntaxToken(SyntaxKind::OBraceToken,_position++,"{");
@@ -172,6 +184,8 @@ namespace mc
             else if(Current()==';') return SyntaxToken(SyntaxKind::SemiToken,_position++,";");
             else if(Current()=='-') return SyntaxToken(SyntaxKind::NegaToken,_position++,"-");
             else if(Current()=='~') return SyntaxToken(SyntaxKind::BComplementToken,_position++,"~");
+            else if(Current()==':') return SyntaxToken(SyntaxKind::ColonToken,_position++,":");
+            else if(Current()=='?') return SyntaxToken(SyntaxKind::QToken,_position++,"?");
             else if (Current() == '!')
             {
                 Next();
@@ -343,8 +357,10 @@ namespace mc
 
     enum ExpKind
     {
-        AssignmentKind,LorKind,
+        AssignmentExp,ConditonalExp,
     };
+
+    class ConditionExp;
 
     class Exp
     {
@@ -352,11 +368,26 @@ namespace mc
         string _id;
         Exp* _next= nullptr;
         ExpKind _kind;
-        LOrExp* _lOrExp= nullptr;
+        ConditionExp* _conditionExp;
+    };
+
+    class ConditionExp
+    {
+    public:
+        LOrExp* _lorExp;
+        Exp* _exp;
+        ConditionExp* _next;
+    };
+
+    class Declaration
+    {
+    public:
+        string _id;
+        Exp* exp= nullptr;
     };
 
     enum StatementType{
-        ReturnType,ExpType,DeclareType
+        ReturnType,ExpType,ConditionType
     };
 
     class Statement
@@ -370,6 +401,8 @@ namespace mc
         }
         StatementType _type;
         Exp* _exp= nullptr;
+        Statement* _statement1= nullptr;
+        Statement* _statement2= nullptr;
         string _id;
 
 //        ~Statement()
@@ -378,18 +411,25 @@ namespace mc
 //        }
     };
 
+    enum BlockType
+    {
+        StatementBlock,DeclarationBlock
+    };
+
+    class BlockItem
+    {
+    public:
+        BlockType _type;
+        Statement* _statement= nullptr;
+        Declaration* _declaration= nullptr;
+    };
+
     class Function
     {
     public:
-        Function()= default;
-        Function(Statement* statement,string name)
-        {
-            _list.push_back(statement);
-            _name=name;
-        }
-        list<Statement*>_list;
 
-        //函数名称
+        list<BlockItem*>_list;
+        //func name
         string _name;
 
     };
@@ -428,7 +468,7 @@ namespace mc
 
         Exp* parse_Exp()
         {
-            //<exp> ::= <id> "=" <exp> | <logical-or-exp>
+            //<exp> ::= <id> "=" <exp> | <conditional-exp>
 
             SyntaxToken p=_lexer->Peek();
             if(p._kind==SyntaxKind::BlankToken)
@@ -454,7 +494,7 @@ namespace mc
                     cout<<"   1   "<<endl;
                     Exp* next_exp=parse_Exp();
 
-                    exp->_kind=ExpKind::AssignmentKind;
+                    exp->_kind=ExpKind::AssignmentExp;
                     exp->_next=next_exp;
                     exp->_id=NAME;
                     //test
@@ -463,12 +503,13 @@ namespace mc
                 {
                     cout<<"   3   "<<endl;
                     _lexer->Setposition(position-1);
-                    LOrExp* lOrExp = parse_LOrExp();
+
+                    exp->_conditionExp=parse_conditionExp();
 
                     cout<<"   4   "<<endl;
 
-                    exp->_kind=ExpKind::LorKind;
-                    exp->_lOrExp=lOrExp;
+                    exp->_kind=ExpKind::ConditonalExp;
+
 
                 }
             }else
@@ -476,13 +517,40 @@ namespace mc
                 //test
                 cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
                 cout<<"kind:"<<p._kind<<" "<<"text:"<<p._text<<endl;
-                LOrExp* lOrExp = parse_LOrExp();
 
-                exp->_kind=ExpKind::LorKind;
-                exp->_lOrExp=lOrExp;
+
+                exp->_kind=ExpKind::ConditonalExp;
+                exp->_conditionExp=parse_conditionExp();
             }
 
             return exp;
+        }
+
+        ConditionExp* parse_conditionExp()
+        {
+            //<conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
+            ConditionExp* ret=new ConditionExp();
+            ret->_lorExp=parse_LOrExp();
+            SyntaxToken p=_lexer->Peek();
+            if(p._kind==SyntaxKind::BlankToken)
+            {
+                _lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            if(p._kind==SyntaxKind::QToken)
+            {
+                //exist conditional expression
+                _lexer->NextToken();
+                ret->_exp=parse_Exp();
+
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::ColonToken) fail("condition error");
+                ret->_next=parse_conditionExp();
+
+            }
+            return ret;
         }
 
         LOrExp* parse_LOrExp()
@@ -740,9 +808,9 @@ namespace mc
         //parse the statement
         Statement* parse_statement()
         {
-            //<statement> ::= "return" <exp> ";"
-            //              | <exp> ";"
-            //              | "int" <id> [ = <exp> ] ";"
+//            <statement> ::= "return" <exp> ";"
+//                            | <exp> ";"
+//                            | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
             SyntaxToken p=_lexer->Peek();
 
             if(p._kind==SyntaxKind::BlankToken)
@@ -770,42 +838,44 @@ namespace mc
 
                 Statement* statement=new Statement(StatementType::ReturnType,exp);
                 return statement;
-            }else if (p._kind==SyntaxKind::IntToken)
+            }else if (p._kind==SyntaxKind::IfToken)
             {
-                //<statement> ::= "int" <id> [ = <exp> ] ";"
+//                "if" "(" <exp> ")" <statement> [ "else" <statement> ];
 
+                Statement* ret=new Statement();
                 _lexer->NextToken();
                 p=_lexer->NextToken();
-                if(p._kind!=SyntaxKind::BlankToken) fail("statement error3");
-
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::OpToken) fail("statement error2");
+                ret->_exp=parse_Exp();
                 p=_lexer->NextToken();
-                if(p._kind!=SyntaxKind::IdToken) fail("statement error1");
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::CpToken) fail("statement error2");
 
-                string ID_NAME=p._text;
+                ret->_statement1=parse_statement();
 
                 p=_lexer->NextToken();
                 if(p._kind==SyntaxKind::BlankToken)
                     p=_lexer->NextToken();
+
                 if(p._kind==SyntaxKind::SemiToken)
+                    return ret;
+
+                if(p._kind==SyntaxKind::ElseToken)
                 {
-                    Statement* statement=new Statement();
-                    statement->_type=StatementType::DeclareType;
-                    statement->_id=ID_NAME;
-                    return statement;
-                }else if (p._kind==SyntaxKind::AssignmentToken)
-                {
-                    Exp* exp=parse_Exp();
+                    p=_lexer->NextToken();
+                    if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
+                    ret->_statement2=parse_statement();
 
                     p=_lexer->NextToken();
                     if(p._kind==SyntaxKind::BlankToken)
                         p=_lexer->NextToken();
-                    if(p._kind!=SyntaxKind::SemiToken) fail("statement error1");
 
-                    Statement* statement=new Statement();
-                    statement->_type=StatementType::DeclareType;
-                    statement->_id=ID_NAME;
-                    statement->_exp=exp;
-                    return statement;
+                    if(p._kind==SyntaxKind::SemiToken) fail("statement error2");
+
+                    return ret;
                 }
 
             }else
@@ -827,7 +897,70 @@ namespace mc
 
             }
 
+            fail("statement error");
             return nullptr;
+        }
+
+        Declaration* parse_declaration()
+        {
+            //<declaration> ::= "int" <id> [ = <exp> ] ";"
+
+            Declaration* ret=new Declaration();
+            SyntaxToken p=_lexer->NextToken();
+
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+
+            if(p._kind!=SyntaxKind::IntToken) fail("declare error");
+            p=_lexer->NextToken();
+
+            if(p._kind!=SyntaxKind::BlankToken) fail("declare error");
+            p=_lexer->NextToken();
+
+            if(p._kind!=SyntaxKind::IdToken) fail("declare error");
+            ret->_id=p._text;
+
+            p=_lexer->NextToken();
+            if(p._kind==SyntaxKind::BlankToken)
+                p=_lexer->NextToken();
+            //no init
+            if(p._kind==SyntaxKind::SemiToken)
+                return ret;
+            //exist assignment
+            if(p._kind==SyntaxKind::AssignmentToken)
+            {
+                ret->exp=parse_Exp();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::SemiToken)
+                    return ret;
+            }
+            fail("declare error");
+            return nullptr;
+        }
+
+        BlockItem* parse_blockItem()
+        {
+            //<block-item> ::= <statement> | <declaration>
+            BlockItem* ret=new BlockItem();
+            SyntaxToken p=_lexer->Peek();
+
+            if(p._kind==SyntaxKind::BlankToken)
+            {
+                _lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            if(p._kind==SyntaxKind::IntToken)
+            {
+                ret->_type=BlockType::DeclarationBlock;
+                ret->_declaration=parse_declaration();
+            }else
+            {
+                ret->_type=BlockType::StatementBlock;
+                ret->_statement=parse_statement();
+            }
+            return ret;
         }
 
         //parse the function
@@ -883,9 +1016,9 @@ namespace mc
 
             while (p._kind!=SyntaxKind::CBraceToken)
             {
-                Statement* next_statement=parse_statement();
+                BlockItem* next_block=parse_blockItem();
 
-                ret->_list.push_back(next_statement);
+                ret->_list.push_back(next_block);
 
                 p=_lexer->Peek();
                 if(p._kind==SyntaxKind::BlankToken)
@@ -936,10 +1069,12 @@ namespace mc
     }
 
 //    <program> ::= <function>
-//    <function> ::= "int" <id> "(" ")" "{" { <statement> } "}"
+//    <function> ::= "int" <id> "(" ")" "{" { <block-item> } "}"
+//    <block-item> ::= <statement> | <declaration>
+//    <declaration> ::= "int" <id> [ = <exp> ] ";"
 //    <statement> ::= "return" <exp> ";"
 //                    | <exp> ";"
-//                    | "int" <id> [ = <exp>] ";"
+//                    | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
 //    <exp> ::= <id> "=" <exp> | <logical-or-exp>
 //    <logical-or-exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
 //    <logical-and-exp> ::= <equality-exp> { "&&" <equality-exp> }
