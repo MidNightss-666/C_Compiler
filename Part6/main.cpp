@@ -476,24 +476,19 @@ namespace mc
                 _lexer->NextToken();
                 p=_lexer->Peek();
             }
-
-
             Exp* exp=new Exp();
             if(p._kind==SyntaxKind::IdToken)
             {
                 int position=p._position;
                 string NAME=p._text;
-
                 _lexer->NextToken();
                 p=_lexer->NextToken();
                 if(p._kind==SyntaxKind::BlankToken)
                     p=_lexer->NextToken();
-
                 if (p._kind==SyntaxKind::AssignmentToken)
                 {
                     cout<<"   1   "<<endl;
                     Exp* next_exp=parse_Exp();
-
                     exp->_kind=ExpKind::AssignmentExp;
                     exp->_next=next_exp;
                     exp->_id=NAME;
@@ -502,15 +497,10 @@ namespace mc
                 }else
                 {
                     cout<<"   3   "<<endl;
-                    _lexer->Setposition(position-1);
-
+                    _lexer->Setposition(position );
                     exp->_conditionExp=parse_conditionExp();
-
                     cout<<"   4   "<<endl;
-
                     exp->_kind=ExpKind::ConditonalExp;
-
-
                 }
             }else
             {
@@ -531,6 +521,9 @@ namespace mc
             //<conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
             ConditionExp* ret=new ConditionExp();
             ret->_lorExp=parse_LOrExp();
+            //test
+            cout<<"condition test"<<endl;
+
             SyntaxToken p=_lexer->Peek();
             if(p._kind==SyntaxKind::BlankToken)
             {
@@ -843,41 +836,41 @@ namespace mc
 //                "if" "(" <exp> ")" <statement> [ "else" <statement> ];
 
                 Statement* ret=new Statement();
+                ret->_type=StatementType::ConditionType;
                 _lexer->NextToken();
                 p=_lexer->NextToken();
                 if(p._kind==SyntaxKind::BlankToken)
                     p=_lexer->NextToken();
-                if(p._kind!=SyntaxKind::OpToken) fail("statement error2");
+                if(p._kind!=SyntaxKind::OpToken) fail("statement error3");
                 ret->_exp=parse_Exp();
                 p=_lexer->NextToken();
                 if(p._kind==SyntaxKind::BlankToken)
                     p=_lexer->NextToken();
-                if(p._kind!=SyntaxKind::CpToken) fail("statement error2");
+                if(p._kind!=SyntaxKind::CpToken) fail("statement error4");
 
                 ret->_statement1=parse_statement();
 
-                p=_lexer->NextToken();
+                p=_lexer->Peek();
                 if(p._kind==SyntaxKind::BlankToken)
-                    p=_lexer->NextToken();
-
-                if(p._kind==SyntaxKind::SemiToken)
-                    return ret;
+                {
+                    _lexer->NextToken();
+                    p=_lexer->Peek();
+                }
 
                 if(p._kind==SyntaxKind::ElseToken)
                 {
+                    _lexer->NextToken();
                     p=_lexer->NextToken();
-                    if(p._kind!=SyntaxKind::BlankToken) fail("statement error2");
+                    if(p._kind!=SyntaxKind::BlankToken) fail("statement error5");
                     ret->_statement2=parse_statement();
 
-                    p=_lexer->NextToken();
-                    if(p._kind==SyntaxKind::BlankToken)
-                        p=_lexer->NextToken();
-
-                    if(p._kind==SyntaxKind::SemiToken) fail("statement error2");
-
-                    return ret;
+//                    p=_lexer->NextToken();
+//                    if(p._kind==SyntaxKind::BlankToken)
+//                        p=_lexer->NextToken();
+//
+//                    if(p._kind==SyntaxKind::SemiToken) fail("statement error2");
                 }
-
+                return ret;
             }else
             {
 
@@ -887,7 +880,7 @@ namespace mc
                 if(p._kind==SyntaxKind::BlankToken)
                     p=_lexer->NextToken();
 
-                if(p._kind!=SyntaxKind::SemiToken) fail("statement error");
+                if(p._kind!=SyntaxKind::SemiToken) fail("statement error6");
 
                 Statement* statement = new Statement();
                 statement->_exp=exp;
@@ -897,7 +890,7 @@ namespace mc
 
             }
 
-            fail("statement error");
+            fail("statement error7");
             return nullptr;
         }
 
@@ -923,6 +916,9 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
+            //test
+            cout<<"declare test!"<<endl;
+
             //no init
             if(p._kind==SyntaxKind::SemiToken)
                 return ret;
@@ -967,7 +963,7 @@ namespace mc
         Function* parse_function()
         {
             //int main() {    return 2;}
-            //<function> ::= "int" <id> "(" ")" "{" { <statement> } "}"
+            //<function> ::= "int" <id> "(" ")" "{" { <block-item> } "}"
 
             SyntaxToken p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
@@ -1256,6 +1252,7 @@ namespace mc
                 conditionalExp_out(exp->_conditionExp);
             }
         }
+
 //        <conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
         void conditionalExp_out(ConditionExp* exp)
         {
@@ -1528,49 +1525,76 @@ namespace mc
 
 
 int main(int argc,char* argv[]) {
-    if(argc<2)
+    int test=0;
+    if(test)
     {
-        cout<<"invalid usage"<<endl;
-        return 1;
-    }
-    const char* filename=argv[1];
-    ifstream fin;
-    fin.open(filename,ios::in);
-    if(!fin.is_open())
-    {
-        cout<<"failed when opening file";
-        exit(EXIT_FAILURE);
-    }
-    string buff;
-    string text="";
-    while(getline(fin,buff))
-    {
-        text.append(buff+" ");
-    }
-    fin.close();
+        string test_text="int main() {     int a = 0;     if (a)         return 1;     else         return 2; }";
 
-    cout<<text<<endl;
+        mc::Lexer* lexer=new mc::Lexer(test_text);
+        mc::Parser* parser=new mc::Parser(lexer);
 
-    mc::Lexer* lexer=new mc::Lexer(text);
-    mc::Parser* parser=new mc::Parser(lexer);
+        //parse the program
+        mc::Program* program=parser->parse_program();
 
-    //parse the program
-    mc::Program* program=parser->parse_program();
-
-    //set the file name
+        //set the file name
 //    string Filename=filename;
 //    int length=Filename.length();
 //    Filename=Filename.substr(0,length-2);
 
-    mc::Varmap* varmap=new mc::Varmap();
-    mc::Assembler* assembler=new mc::Assembler(varmap,filename);
+        mc::Varmap* varmap=new mc::Varmap();
+        mc::Assembler* assembler=new mc::Assembler(varmap,"test.s");
 
-    assembler->aOut(program);
+        assembler->aOut(program);
+    }
+    else
+    {
+        if(argc<2)
+        {
+            cout<<"invalid usage"<<endl;
+            return 1;
+        }
+        const char* filename=argv[1];
+        ifstream fin;
+        fin.open(filename,ios::in);
+        if(!fin.is_open())
+        {
+            cout<<"failed when opening file";
+            exit(EXIT_FAILURE);
+        }
+        string buff;
+        string text="";
+        while(getline(fin,buff))
+        {
+            text.append(buff+" ");
+        }
+        fin.close();
+
+        cout<<text<<endl;
+
+        mc::Lexer* lexer=new mc::Lexer(text);
+        mc::Parser* parser=new mc::Parser(lexer);
+
+        //parse the program
+        mc::Program* program=parser->parse_program();
+
+        //set the file name
+//    string Filename=filename;
+//    int length=Filename.length();
+//    Filename=Filename.substr(0,length-2);
+
+        mc::Varmap* varmap=new mc::Varmap();
+        mc::Assembler* assembler=new mc::Assembler(varmap,filename);
+
+        assembler->aOut(program);
 
 //    string command="gcc ";
 //
 //    command.append(Filename+".s -o ").append(Filename);
 //        system(command.c_str());
+
+    }
+
+
 
 
     return 0;
