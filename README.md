@@ -3,8 +3,8 @@
 ### 简介
 如你所见，这是一个简单的C编译器，根据下列教程所编写：
 <br>https://norasandler.com/2017/11/29/Write-a-Compiler.html
-<br>完成了第一阶段,通过了该repo中的stage1测试
-<br>网址：https://github.com/nlsandler/write_a_c_compiler
+<br>完成了第一阶段,通过了该repo中的stage1测试 **(更新中...)**
+<br>*repo*网址：https://github.com/nlsandler/write_a_c_compiler
 
 ### 使用方法
 #### 1

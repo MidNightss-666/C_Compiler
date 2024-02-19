@@ -14,3 +14,5 @@ add_executable(Part4 ../Part4/main.cpp)
 add_executable(Part5 ../Part5/main.cpp)
 
 add_executable(Part6 ../Part6/main.cpp)
+
+add_executable(Part7 ../Part7/main.cpp)
