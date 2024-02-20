@@ -79,6 +79,16 @@ namespace mc
         ColonToken,
         //?
         QToken,
+        //for
+        ForToken,
+        //while
+        WhileToken,
+        //do
+        DoToken,
+        //break
+        BreakToken,
+        //continue
+        ContinueToken,
         //unset
         Unset,
         //others
@@ -176,6 +186,16 @@ namespace mc
                     return SyntaxToken(SyntaxKind::IfToken,start,text);
                 if(text=="else")
                     return SyntaxToken(SyntaxKind::ElseToken,start,text);
+                if(text=="for")
+                    return SyntaxToken(SyntaxKind::ForToken,start,text);
+                if(text=="while")
+                    return SyntaxToken(SyntaxKind::WhileToken,start,text);
+                if(text=="do")
+                    return SyntaxToken(SyntaxKind::DoToken,start,text);
+                if(text=="break")
+                    return SyntaxToken(SyntaxKind::BreakToken,start,text);
+                if(text=="continue")
+                    return SyntaxToken(SyntaxKind::ContinueToken,start,text);
                 else return SyntaxToken(SyntaxKind::IdToken,start,text);
             }
             if(Current()=='{') return SyntaxToken(SyntaxKind::OBraceToken,_position++,"{");
@@ -372,6 +392,18 @@ namespace mc
         ConditionExp* _conditionExp;
     };
 
+    enum ExpOptionKind
+    {
+        EmptyExpOption,NoEmpty
+    };
+
+    class ExpOption
+    {
+    public:
+        ExpOptionKind _kind;
+        Exp* _exp;
+    };
+
     class ConditionExp
     {
     public:
@@ -388,7 +420,8 @@ namespace mc
     };
 
     enum StatementType{
-        ReturnType,ExpType,ConditionType,CompoundType
+        ReturnType,ExpType,ConditionType,CompoundType,For_1,For_2,WhileStatement,DoWhileStatement,
+        BreakStatement,ContinueStatement
     };
 
     class BlockItem;
@@ -409,10 +442,12 @@ namespace mc
         string _id;
         list<BlockItem*> _list;
 
-//        ~Statement()
-//        {
-//            delete _exp;
-//        }
+        ExpOption* _initExp;
+        ExpOption* _controlExp;
+        ExpOption* _postExp;
+        Declaration* _declaration;
+        Statement* _loopStatement;
+        ExpOption* _expOption;
     };
 
     enum BlockType
@@ -518,6 +553,12 @@ namespace mc
             }
 
             return exp;
+        }
+
+        ExpOption* parse_ExpOption()
+        {
+            //<exp-option> ::= <exp> | ""???
+
         }
 
         ConditionExp* parse_conditionExp()
@@ -806,9 +847,15 @@ namespace mc
         Statement* parse_statement()
         {
 //            <statement> ::= "return" <exp> ";"
-//                            | <exp> ";"
-//                            | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
-//                            | "{" { <block-item> } "}
+//                          | <exp-option> ";"
+//                          | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
+//                          | "{" { <block-item> } "}
+//                          | "for" "(" <exp-option> ";" <exp-option> ";" <exp-option> ")" <statement>
+//                          | "for" "(" <declaration> <exp-option> ";" <exp-option> ")" <statement>
+//                          | "while" "(" <exp> ")" <statement>
+//                          | "do" <statement> "while" "(" <exp> ")" ";"
+//                          | "break" ";"
+//                          | "continue" ";"
             SyntaxToken p=_lexer->Peek();
 
             if(p._kind==SyntaxKind::BlankToken)
@@ -818,7 +865,7 @@ namespace mc
             }
 
 
-            if(p._kind==SyntaxKind::RetToken)
+            if (p._kind==SyntaxKind::RetToken)
             {
                 //<statement> ::= "return" <exp> ";"
                 _lexer->NextToken();
@@ -834,7 +881,8 @@ namespace mc
 
                 Statement* statement=new Statement(StatementType::ReturnType,exp);
                 return statement;
-            }else if (p._kind==SyntaxKind::IfToken)
+            }
+            else if (p._kind==SyntaxKind::IfToken)
             {
 //                "if" "(" <exp> ")" <statement> [ "else" <statement> ];
 
@@ -874,7 +922,8 @@ namespace mc
 //                    if(p._kind==SyntaxKind::SemiToken) fail("statement error2");
                 }
                 return ret;
-            }else if (p._kind==SyntaxKind::OBraceToken)
+            }
+            else if (p._kind==SyntaxKind::OBraceToken)
             {
                 Statement* ret=new Statement();
 //                "{" { <block-item> } "}
@@ -902,10 +951,76 @@ namespace mc
                 ret->_type=StatementType::CompoundType;
                 return ret;
             }
+            else if (p._kind==SyntaxKind::ForToken)
+            {
+//            "for" "(" <exp-option> ";" <exp-option> ";" <exp-option> ")" <statement>
+//            "for" "(" <declaration> <exp-option> ";" <exp-option> ")" <statement>
+                _lexer->NextToken();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::OpToken) fail("expect a (");
+                Statement* ret=new Statement();
+                p=_lexer->Peek();
+                if(p._kind==SyntaxKind::BlankToken)
+                {
+                    _lexer->NextToken();
+                    p=_lexer->Peek();
+                }
+                if(p._kind==SyntaxKind::IntToken)
+                {
+                    ret->_type=StatementType::For_2;
+                    ret->_declaration=parse_declaration();
+
+                }
+                else
+                {
+                    ret->_type=StatementType::For_1;
+                    ret->_initExp=parse_ExpOption();
+
+                    p=_lexer->NextToken();
+                    if(p._kind==SyntaxKind::BlankToken)
+                        p=_lexer->NextToken();
+                    if (p._kind!=SyntaxKind::SemiToken) fail("expect a ;");
+                }
+                ret->_controlExp=parse_ExpOption();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if (p._kind!=SyntaxKind::SemiToken) fail("expect a ;");
+                ret->_postExp=parse_ExpOption();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::CpToken) fail("expect a )");
+                ret->_loopStatement=parse_statement();
+                return ret;
+            }
+            else if (p._kind==SyntaxKind::WhileToken)
+            {
+                //"while" "(" <exp> ")" <statement>
+
+            }
+            else if (p._kind==SyntaxKind::DoToken)
+            {
+                //"do" <statement> "while" "(" <exp> ")" ";"
+
+            }
+            else if (p._kind==SyntaxKind::BreakToken)
+            {
+                //"break" ";"
+
+            }
+            else if (p._kind==SyntaxKind::ContinueToken)
+            {
+                //"continue" ";"
+                _lexer->NextToken();
+
+            }
             else
             {
-//              <exp> ";"
-                Exp* exp=parse_Exp();
+//              <exp-option> ";"
+                ExpOption* expOption=parse_ExpOption();
                 p=_lexer->NextToken();
 
                 if(p._kind==SyntaxKind::BlankToken)
@@ -914,7 +1029,7 @@ namespace mc
                 if(p._kind!=SyntaxKind::SemiToken) fail("statement error6");
 
                 Statement* statement = new Statement();
-                statement->_exp=exp;
+                statement->_expOption=expOption;
                 statement->_type=StatementType::ExpType;
 
                 return statement;
@@ -1100,9 +1215,16 @@ namespace mc
 //    <block-item> ::= <statement> | <declaration>
 //    <declaration> ::= "int" <id> [ = <exp> ] ";"
 //    <statement> ::= "return" <exp> ";"
-//                    | <exp> ";"
+//                    | <exp-option> ";"
 //                    | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
 //                    | "{" { <block-item> } "}
+//                    | "for" "(" <exp-option> ";" <exp-option> ";" <exp-option> ")" <statement>
+//                    | "for" "(" <declaration> <exp-option> ";" <exp-option> ")" <statement>
+//                    | "while" "(" <exp> ")" <statement>
+//                    | "do" <statement> "while" "(" <exp> ")" ";"
+//                    | "break" ";"
+//                    | "continue" ";"
+//    <exp-option> ::= <exp> | ""
 //    <exp> ::= <id> "=" <exp> | <conditional-exp>
 //    <conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
 //    <logical-or-exp> ::= <logical-and-exp> { "||" <logical-and-exp> }
