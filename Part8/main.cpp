@@ -16,7 +16,9 @@ using namespace std;
 
 namespace mc
 {
-    void fail(const char* text)
+    class Lexer;
+
+    void fail(const char* text,Lexer* lexer= nullptr)
     {
         fprintf(stderr,text);
         cout<<"\n";
@@ -557,8 +559,24 @@ namespace mc
 
         ExpOption* parse_ExpOption()
         {
-            //<exp-option> ::= <exp> | ""???
-
+            //<exp-option> ::= <exp> | ""
+            ExpOption* ret=new ExpOption();
+            SyntaxToken p=_lexer->Peek();
+            if (p._kind==SyntaxKind::BlankToken)
+            {
+                _lexer->NextToken();
+                p=_lexer->Peek();
+            }
+            if (p._kind==SyntaxKind::SemiToken
+                ||p._kind==SyntaxKind::CpToken)
+            {
+                ret->_kind=ExpOptionKind::EmptyExpOption;
+            }else
+            {
+                ret->_kind=ExpOptionKind::NoEmpty;
+                ret->_exp=parse_Exp();
+            }
+            return ret;
         }
 
         ConditionExp* parse_conditionExp()
@@ -999,23 +1017,77 @@ namespace mc
             else if (p._kind==SyntaxKind::WhileToken)
             {
                 //"while" "(" <exp> ")" <statement>
+                Statement* ret=new Statement();
+
+                _lexer->NextToken();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if (p._kind!=SyntaxKind::OpToken) fail("expect a (");
+                ret->_exp=parse_Exp();
+
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if (p._kind!=SyntaxKind::CpToken) fail("expect a )");
+
+                ret->_loopStatement=parse_statement();
+                ret->_type=StatementType::WhileStatement;
+                return ret;
 
             }
             else if (p._kind==SyntaxKind::DoToken)
             {
                 //"do" <statement> "while" "(" <exp> ")" ";"
+                _lexer->NextToken();
+                Statement* ret=new Statement();
+                ret->_loopStatement=parse_statement();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::WhileToken) fail("single do detected");
 
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if (p._kind!=SyntaxKind::OpToken) fail("expect a (");
+                ret->_exp=parse_Exp();
+
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if (p._kind!=SyntaxKind::CpToken) fail("expect a )");
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if (p._kind!=SemiToken) fail("expect a ;");
+                ret->_type=StatementType::DoWhileStatement;
+                return ret;
             }
             else if (p._kind==SyntaxKind::BreakToken)
             {
                 //"break" ";"
+                _lexer->NextToken();
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::SemiToken) fail("expect a ;");
+                Statement* ret=new Statement();
+                ret->_type=StatementType::BreakStatement;
+                return ret;
 
             }
             else if (p._kind==SyntaxKind::ContinueToken)
             {
                 //"continue" ";"
                 _lexer->NextToken();
-
+                p=_lexer->NextToken();
+                if(p._kind==SyntaxKind::BlankToken)
+                    p=_lexer->NextToken();
+                if(p._kind!=SyntaxKind::SemiToken) fail("expect a ;");
+                Statement* ret=new Statement();
+                ret->_type=StatementType::ContinueStatement;
+                return ret;
             }
             else
             {
@@ -1330,7 +1402,7 @@ namespace mc
 //        <statement> ::= "return" <exp> ";"
 //                        | <exp> ";"
 //                        | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
-//                        | "{" { <block-item> } "}
+//                        | "{" { <block-item> } "}"
         void statement_out(Statement* statement,Varmap* varmap)
         {
             if (statement->_type==StatementType::ConditionType)
@@ -1350,18 +1422,21 @@ namespace mc
                 }else
                     fout<<flag1<<":"<<endl;
 
-            }else if (statement->_type==StatementType::ExpType)
+            }
+            else if (statement->_type==StatementType::ExpType)
             {
                 exp_out(statement->_exp,varmap);
 
-            }else if (statement->_type==StatementType::ReturnType)
+            }
+            else if (statement->_type==StatementType::ReturnType)
             {
                 exp_out(statement->_exp,varmap);
 
                 fout<<"    movl %ebp, %esp"<<endl;
                 fout<<"    pop %ebp"<<endl;
                 fout<<"ret"<<endl;
-            }else if (statement->_type==StatementType::CompoundType)
+            }
+            else if (statement->_type==StatementType::CompoundType)
             {
                 //generate block
 
@@ -1386,7 +1461,11 @@ namespace mc
             }
         }
 
-        //<block-item> ::= <statement> | <declaration>
+        //    <exp-option> ::= <exp> | ""
+        void expOption_out(ExpOption* expOption,Varmap* varmap)
+        {
+
+        }
 
 
         //<declaration> ::= "int" <id> [ = <exp> ] ";"
