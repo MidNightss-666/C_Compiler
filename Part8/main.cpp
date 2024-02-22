@@ -422,7 +422,9 @@ namespace mc
     };
 
     enum StatementType{
-        ReturnType,ExpType,ConditionType,CompoundType,For_1,For_2,WhileStatement,DoWhileStatement,
+        ReturnType,ExpType,ConditionType,CompoundType,
+        For_1,For_2,
+        WhileStatement,DoWhileStatement,
         BreakStatement,ContinueStatement
     };
 
@@ -1399,11 +1401,17 @@ namespace mc
             }
         }
 
-//        <statement> ::= "return" <exp> ";"
-//                        | <exp> ";"
-//                        | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
-//                        | "{" { <block-item> } "}"
-        void statement_out(Statement* statement,Varmap* varmap)
+//            <statement> ::= "return" <exp> ";"
+//                          | <exp-option> ";"
+//                          | "if" "(" <exp> ")" <statement> [ "else" <statement> ]
+//                          | "{" { <block-item> } "}
+//                          | "for" "(" <exp-option> ";" <exp-option> ";" <exp-option> ")" <statement>
+//                          | "for" "(" <declaration> <exp-option> ";" <exp-option> ")" <statement>
+//                          | "while" "(" <exp> ")" <statement>
+//                          | "do" <statement> "while" "(" <exp> ")" ";"
+//                          | "break" ";"
+//                          | "continue" ";"
+        void statement_out(Statement* statement,Varmap* varmap,string break_flag = "",string continue_flag = "")
         {
             if (statement->_type==StatementType::ConditionType)
             {
@@ -1447,7 +1455,7 @@ namespace mc
                 {
                     if(item->_type==BlockType::StatementBlock)
                     {
-                        statement_out(item->_statement,varmap);
+                        statement_out(item->_statement,varmap,break_flag,continue_flag);
                     }else if (item->_type==BlockType::DeclarationBlock)
                     {
                         varmap=declaration_out(item->_declaration,varmap,&current_scope);
@@ -1459,12 +1467,98 @@ namespace mc
                 fout<<"    addl $"<<bytes_to_deallocate<<", %esp"<<endl;
 
             }
+            else if (statement->_type==StatementType::For_1)
+            {
+                //"for" "(" <exp-option> ";" <exp-option> ";" <exp-option> ")" <statement>
+                string flag1=clause_counter();
+                string flag2=return_counter();
+                string flag3=clause_counter();
+
+                expOption_out(statement->_initExp,varmap);
+
+                fout<<flag1<<":"<<endl;
+                expOption_out(statement->_controlExp,varmap);
+                fout<<"    cmpl $0, %eax"<<endl;
+                fout<<"    je "<<flag2<<endl;
+                statement_out(statement->_loopStatement,varmap,flag2,flag3);
+                fout<<flag3<<":"<<endl;
+                expOption_out(statement->_postExp,varmap);
+                fout<<"    jmp "<<flag1<<endl;
+                fout<<flag2<<":"<<endl;
+            }
+            else if (statement->_type==StatementType::For_2)
+            {
+                //"for" "(" <declaration> <exp-option> ";" <exp-option> ")" <statement>
+                set<string>current_scope;
+                varmap=declaration_out(statement->_declaration,varmap,&current_scope);
+                string flag1=clause_counter();
+                string flag2=return_counter();
+                string flag3=clause_counter();
+
+                fout<<flag1<<":"<<endl;
+                expOption_out(statement->_controlExp,varmap);
+                fout<<"    cmpl $0, %eax"<<endl;
+                fout<<"    je "<<flag2<<endl;
+                statement_out(statement->_loopStatement,varmap,flag2,flag3);
+                fout<<flag3<<":"<<endl;
+                expOption_out(statement->_postExp,varmap);
+                fout<<"    jmp "<<flag1<<endl;
+                fout<<flag2<<":"<<endl;
+
+                int bytes_to_deallocate = 4 * current_scope.size();
+                stack_index+=bytes_to_deallocate;
+                fout<<"    addl $"<<bytes_to_deallocate<<", %esp"<<endl;
+            }
+            else if (statement->_type==StatementType::WhileStatement)
+            {
+                //"while" "(" <exp> ")" <statement>
+                string flag1=clause_counter();
+                string flag2=clause_counter();
+
+                fout<<flag2<<":"<<endl;
+                exp_out(statement->_exp,varmap);
+                fout<<"    cmpl $0, %eax"<<endl;
+                fout<<"    je "<<flag1<<endl;
+                statement_out(statement->_loopStatement,varmap,flag1,flag2);
+                fout<<"    jmp "<<flag2<<endl;
+                fout<<flag1<<":"<<endl;
+            }
+            else if (statement->_type==StatementType::DoWhileStatement)
+            {
+                //"do" <statement> "while" "(" <exp> ")" ";"
+                string flag1=clause_counter();
+                string flag2=clause_counter();
+                string flag3=clause_counter();
+
+                fout<<flag1<<":"<<endl;
+                statement_out(statement->_loopStatement,varmap,flag2,flag3);
+                fout<<flag3<<":"<<endl;
+                exp_out(statement->_exp,varmap);
+                fout<<"    cmpl $0, %eax"<<endl;
+                fout<<"    jne "<<flag1<<endl;
+                fout<<flag2<<":"<<endl;
+            }
+            else if (statement->_type==StatementType::BreakStatement)
+            {
+                if (break_flag.empty()) fail("break outside loop");
+                fout<<"    jmp "<<break_flag<<endl;
+            }
+            else if (statement->_type==StatementType::ContinueStatement)
+            {
+                if (continue_flag.empty()) fail("continue outside loop");
+                fout<<"    jmp "<<continue_flag<<endl;
+            }
         }
 
         //    <exp-option> ::= <exp> | ""
         void expOption_out(ExpOption* expOption,Varmap* varmap)
         {
+            if (expOption->_kind==ExpOptionKind::NoEmpty)
+                exp_out(expOption->_exp,varmap);
+            else
+            {
 
+            }
         }
 
 
