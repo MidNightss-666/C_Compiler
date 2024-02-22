@@ -530,26 +530,21 @@ namespace mc
                     p=_lexer->NextToken();
                 if (p._kind==SyntaxKind::AssignmentToken)
                 {
-                    cout<<"   1   "<<endl;
                     Exp* next_exp=parse_Exp();
                     exp->_kind=ExpKind::AssignmentExp;
                     exp->_next=next_exp;
                     exp->_id=NAME;
-                    //test
-                    cout<<"   2   "<<endl;
                 }else
                 {
-                    cout<<"   3   "<<endl;
                     _lexer->Setposition(position );
                     exp->_conditionExp=parse_conditionExp();
-                    cout<<"   4   "<<endl;
                     exp->_kind=ExpKind::ConditonalExp;
                 }
             }else
             {
                 //test
-                cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
-                cout<<"kind:"<<p._kind<<" "<<"text:"<<p._text<<endl;
+//                cout<<"pos:"<<_lexer->show_pos()<<" "<<p._position<<endl;
+//                cout<<"kind:"<<p._kind<<" "<<"text:"<<p._text<<endl;
 
 
                 exp->_kind=ExpKind::ConditonalExp;
@@ -586,8 +581,6 @@ namespace mc
             //<conditional-exp> ::= <logical-or-exp> [ "?" <exp> ":" <conditional-exp> ]
             ConditionExp* ret=new ConditionExp();
             ret->_lorExp=parse_LOrExp();
-            //test
-            cout<<"condition test"<<endl;
 
             SyntaxToken p=_lexer->Peek();
             if(p._kind==SyntaxKind::BlankToken)
@@ -991,7 +984,6 @@ namespace mc
                 {
                     ret->_type=StatementType::For_2;
                     ret->_declaration=parse_declaration();
-
                 }
                 else
                 {
@@ -1136,9 +1128,6 @@ namespace mc
             p=_lexer->NextToken();
             if(p._kind==SyntaxKind::BlankToken)
                 p=_lexer->NextToken();
-            //test
-            cout<<"declare test!"<<endl;
-
             //no init
             if(p._kind==SyntaxKind::SemiToken)
                 return ret;
@@ -1325,13 +1314,6 @@ namespace mc
             return _map[s];
         }
 
-        Varmap* copy()
-        {
-            unordered_map<string,int> copy_map(_map);
-            Varmap* ret=new Varmap();
-            ret->set_map(copy_map);
-        }
-
         Varmap* push(string s,int stack_index)
         {
             unordered_map<string,int> copy_map(_map);
@@ -1419,13 +1401,13 @@ namespace mc
                 string flag1=clause_counter();
                 fout<<"    cmpl $0, %eax"<<endl;
                 fout<<"    je "<<flag1<<endl;
-                statement_out(statement->_statement1,varmap);
+                statement_out(statement->_statement1,varmap,break_flag,continue_flag);
                 if(statement->_statement2!= nullptr)
                 {
                     string flag2=clause_counter();
                     fout<<"    jmp  "<<flag2<<endl;
                     fout<<flag1<<":"<<endl;
-                    statement_out(statement->_statement2,varmap);
+                    statement_out(statement->_statement2,varmap,break_flag,continue_flag);
                     fout<<flag2<<":"<<endl;
                 }else
                     fout<<flag1<<":"<<endl;
@@ -1433,8 +1415,7 @@ namespace mc
             }
             else if (statement->_type==StatementType::ExpType)
             {
-                exp_out(statement->_exp,varmap);
-
+                expOption_out(statement->_expOption,varmap);
             }
             else if (statement->_type==StatementType::ReturnType)
             {
@@ -1477,9 +1458,12 @@ namespace mc
                 expOption_out(statement->_initExp,varmap);
 
                 fout<<flag1<<":"<<endl;
-                expOption_out(statement->_controlExp,varmap);
-                fout<<"    cmpl $0, %eax"<<endl;
-                fout<<"    je "<<flag2<<endl;
+                if (statement->_controlExp->_kind==ExpOptionKind::NoEmpty)
+                {
+                    expOption_out(statement->_controlExp,varmap);
+                    fout<<"    cmpl $0, %eax"<<endl;
+                    fout<<"    je "<<flag2<<endl;
+                }
                 statement_out(statement->_loopStatement,varmap,flag2,flag3);
                 fout<<flag3<<":"<<endl;
                 expOption_out(statement->_postExp,varmap);
@@ -1496,9 +1480,12 @@ namespace mc
                 string flag3=clause_counter();
 
                 fout<<flag1<<":"<<endl;
-                expOption_out(statement->_controlExp,varmap);
-                fout<<"    cmpl $0, %eax"<<endl;
-                fout<<"    je "<<flag2<<endl;
+                if (statement->_controlExp->_kind==ExpOptionKind::NoEmpty)
+                {
+                    expOption_out(statement->_controlExp,varmap);
+                    fout<<"    cmpl $0, %eax"<<endl;
+                    fout<<"    je "<<flag2<<endl;
+                }
                 statement_out(statement->_loopStatement,varmap,flag2,flag3);
                 fout<<flag3<<":"<<endl;
                 expOption_out(statement->_postExp,varmap);
@@ -1555,10 +1542,6 @@ namespace mc
         {
             if (expOption->_kind==ExpOptionKind::NoEmpty)
                 exp_out(expOption->_exp,varmap);
-            else
-            {
-
-            }
         }
 
 
@@ -1887,7 +1870,7 @@ int main(int argc,char* argv[]) {
     int test=0;
     if(test)
     {
-        string test_text="int main() {     int a = 1;     {         int a = 2;     }     {         return a;     } }";
+        string test_text="int main() {     int sum = 0;     for (int i = 0; i < 10; i = i + 1) {         sum = sum + i;         if (sum > 10)             break;     }     return sum; } ";
 
         mc::Lexer* lexer=new mc::Lexer(test_text);
         mc::Parser* parser=new mc::Parser(lexer);
